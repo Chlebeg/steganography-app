@@ -90,18 +90,20 @@ def printPixels(pixels):
         for x in range(min(10, w)):
             print(f"Pixel ({x}, {y}): {pixels[y, x]}")  # Print RGB values for each pixel
 
-def fiveModulusEncoding(pixels, secret_message):
+def fiveModulusEncoding(imagePath, secret_message):
     """
     Encodes a secret message into the red channel of the pixel array by modifying
     red values in blocks of 5x5 pixels.
     
     Parameters:
-    pixels (numpy array): Pixel array in RGB format.
+    imagePath (str): Path to the image
     secret_message (str): The secret message to encode.
     
     Returns:
-    numpy array: Modified pixel array with the encoded message.
+    Nothing
     """
+    pixels = imageToPixels(imagePath)
+    secret_message = secret_message.replace("\n", " ")
     if len(pixels.shape) == 3 and pixels.shape[2] == 3:
         red_layer = pixels[:, :, 0]
         
@@ -125,20 +127,20 @@ def fiveModulusEncoding(pixels, secret_message):
                 break
     else:
         print("Error: Expected an RGB image.")
-    
-    return pixels
+    pixelsToImage(pixels, "outputFiveModulus.png") 
 
-def fiveModulusDecoding(pixels):
+def fiveModulusDecoding(imagePath):
     """
     Decodes a secret message from the red channel of the pixel array by reading 
     the red values in blocks of 5x5 pixels.
     
     Parameters:
-    pixels (numpy array): Pixel array in RGB format.
+    imagePath (str): Path to the image
     
     Returns:
     str: The decoded secret message.
     """
+    pixels = imageToPixels(imagePath)
     result = ""
     if len(pixels.shape) == 3 and pixels.shape[2] == 3:
         height, width, _ = pixels.shape
@@ -183,9 +185,8 @@ if __name__ == "__main__":
             sys.exit(1)
     elif option == "-e":
         try:
-            pixels = imageToPixels(image_path)
             secret_message = input("Enter a secret message to encode in the image: ")
-            pixels = fiveModulusEncoding(pixels, secret_message)
+            pixels = fiveModulusEncoding(image_path, secret_message)
             output_image_path = "output_image.png"
             pixelsToImage(pixels, output_image_path)
         except Exception as e:

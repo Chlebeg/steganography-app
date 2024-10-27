@@ -1,10 +1,12 @@
 import tkinter as tk
+from fiveModulus import *
+from lsbRGB import *
 from tkinter import ttk, filedialog
 
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title("Aplikacja Kodowanie/Dekodowanie")
+        self.root.title("Steganografia")
 
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
@@ -14,101 +16,139 @@ class App:
 
         # Creating tabs
         self.tabs = []
+        self.textEntries = {}  # Dictionary to hold text entries for each tab
+        self.imagePaths = {}    # Dictionary to hold selected image paths for each tab
+        self.imagePathLabels = {}  # Dictionary to hold labels for image paths
         tabsName = ["LSB", "FiveModulus", "EdgeLSB", "COS", "COS", "COS", "COS"]
         for i in range(7):
             tab = ttk.Frame(self.notebook)
             self.notebook.add(tab, text=tabsName[i])
             self.tabs.append(tab)
-            self.create_tab(tab)
+            self.createTab(tab, tabsName[i])
 
-        # Button at the bottom to select an image from the filesystem
-        self.select_image_button = tk.Button(self.root, text="Select Image", command=self.select_image)
-        self.select_image_button.grid(row=1, column=0, pady=10, padx=10, sticky="ew")
-
-    def create_tab(self, tab):
+    def createTab(self, tab, tabsName):
         # Configure grid weights to make elements inside the tab responsive
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
         # Encoding and decoding buttons (at the top)
-        button_frame = tk.Frame(tab)
-        button_frame.grid(row=0, column=0, pady=10, sticky="ew")
-        button_frame.columnconfigure(0, weight=1)
-        button_frame.columnconfigure(1, weight=1)
+        buttonFrame = tk.Frame(tab)
+        buttonFrame.grid(row=0, column=0, pady=10, sticky="ew")
+        buttonFrame.columnconfigure(0, weight=1)
+        buttonFrame.columnconfigure(1, weight=1)
+        buttonFrame.columnconfigure(2, weight=0)  # For the Info button
 
-        encode_button = tk.Button(button_frame, text="Kodowanie", width=20, command=lambda: self.encode(tab))
-        decode_button = tk.Button(button_frame, text="Dekodowanie", width=20, command=lambda: self.decode(tab))
+        encodeButton = tk.Button(buttonFrame, text="Kodowanie", width=20, command=lambda: self.encode(tabsName))
+        decodeButton = tk.Button(buttonFrame, text="Dekodowanie", width=20, command=lambda: self.decode(tabsName))
+        
+        # Move the info button to the middle
+        infoButton = tk.Button(buttonFrame, text="Info", command=lambda: self.showInfo())
 
-        encode_button.grid(row=0, column=0, padx=20, pady=5, sticky="ew")
-        decode_button.grid(row=0, column=1, padx=20, pady=5, sticky="ew")
+        encodeButton.grid(row=0, column=0, padx=20, pady=5, sticky="ew")
+        infoButton.grid(row=0, column=1, padx=20, pady=5, sticky="ew")  # Place it between Kodowanie and Dekodowanie
+        decodeButton.grid(row=0, column=2, padx=20, pady=5, sticky="ew")
 
-        # Containers for text input/file selection options and input fields
-        main_frame = tk.Frame(tab)
-        main_frame.grid(row=1, column=0, pady=10, sticky="nsew")
-        main_frame.columnconfigure(0, weight=1)
-        main_frame.columnconfigure(1, weight=3)
+        # Containers for text input and image selection
+        mainFrame = tk.Frame(tab)
+        mainFrame.grid(row=1, column=0, pady=10, sticky="nsew")
+        mainFrame.columnconfigure(0, weight=1)
+        mainFrame.columnconfigure(1, weight=3)
 
-        # Option to input text or select a file (on the left)
-        option_frame = tk.Frame(main_frame)
-        option_frame.grid(row=0, column=0, padx=20, sticky="nw")
+        # Text entry field for encoding (specific to this tab)
+        textEntry = tk.Text(mainFrame, height=5, width=40)
+        textEntry.grid(row=0, column=1, padx=20, sticky="nsew")
+        self.textEntries[tabsName] = textEntry  # Store the text entry for this tab
 
-        self.text_option = tk.StringVar(value="text")
-        text_radio = tk.Radiobutton(option_frame, text="Wpisz tekst", variable=self.text_option, value="text", command=self.toggle_input)
-        file_radio = tk.Radiobutton(option_frame, text="Wybierz plik", variable=self.text_option, value="file", command=self.toggle_input)
-        text_radio.pack(anchor="w")
-        file_radio.pack(anchor="w")
+        # Button to select image
+        selectImageButton = tk.Button(tab, text="Wybierz zdjęcie", command=lambda: self.selectImage(tabsName))
+        selectImageButton.grid(row=2, column=0, pady=10, padx=10, sticky="ew")
 
-        # Input fields (on the right)
-        self.input_frame = tk.Frame(main_frame)
-        self.input_frame.grid(row=0, column=1, padx=20, sticky="nsew")
+        # Label to show the selected image's path (specific to this tab)
+        imagePathLabel = tk.Label(tab, text="", fg="blue")
+        imagePathLabel.grid(row=3, column=0, padx=10, pady=5, sticky="ew")
+        self.imagePathLabels[tabsName] = imagePathLabel  # Store the label for this tab
 
-        # Text entry field
-        self.text_entry = tk.Text(self.input_frame, height=5, width=40)
-        self.text_entry.pack(fill=tk.BOTH, expand=True, pady=10)
+        # Initialize image path for this tab
+        self.imagePaths[tabsName] = ""  # Store the image path for this tab
 
-        # File selection button (not shown initially)
-        self.file_button = tk.Button(self.input_frame, text="Wybierz plik", command=self.load_file)
+    def showInfo(self):
+        # Create a new Toplevel window for the info
+        infoWindow = tk.Toplevel(self.root)
+        infoWindow.title("Informacje")
+        
+        # Create a label with information text
+        infoText = tk.Label(infoWindow, text="This is an application for steganography.\n\n"
+                                               "Use the buttons to encode or decode messages in images.\n"
+                                               "Select an image using 'Wybierz zdjęcie' button.")
+        infoText.pack(padx=20, pady=20)
 
-        # Initial visibility setting
-        self.toggle_input()
+        # Add a close button
+        closeButton = tk.Button(infoWindow, text="Close", command=infoWindow.destroy)
+        closeButton.pack(pady=5)
 
-    def toggle_input(self):
-        # If the text option is selected, show the text field, hide the file button
-        if self.text_option.get() == "text":
-            self.text_entry.pack(fill=tk.BOTH, expand=True, pady=10)
-            self.file_button.pack_forget()  # Hide the file button
-        # If the file option is selected, show the file button, hide the text field
+    def showTextInWindow(self, text):
+        # Create a new Toplevel window
+        newWindow = tk.Toplevel()
+        newWindow.title("Text Display")
+        
+        # Create a label to show the text
+        textLabel = tk.Label(newWindow, text=text, wraplength=300, justify="left")
+        textLabel.pack(padx=20, pady=20)
+
+        # Add a close button
+        closeButton = tk.Button(newWindow, text="Zamknij", command=newWindow.destroy)
+        closeButton.pack(pady=5)
+
+    def encode(self, tabsName):
+        # Get the text from the text entry box for the specific tab
+        text = self.textEntries[tabsName].get("1.0", tk.END).strip()
+        imagePath = self.imagePaths[tabsName]  # Get the selected image path for this tab
+
+        if not imagePath:
+            self.showTextInWindow("Musisz wybrać zdjęcie")
+            print("Musisz wybrać zdjęcie")  # Prompt to select an image
+            return
+
+        if text:
+            match tabsName:
+                case "LSB":
+                    pass
+                case "FiveModulus":
+                    fiveModulusEncoding(imagePath, text) 
+                case "EdgeLSB":
+                    pass
+            print(f"Encoding text in {tabsName} tab: {text}")
         else:
-            self.text_entry.pack_forget()  # Hide the text entry
-            self.file_button.pack(fill=tk.BOTH, expand=True, pady=10)
+            print("No text entered for encoding")
 
-    def encode(self, tab):
-        if self.text_option.get() == "text":
-            text = self.text_entry.get("1.0", tk.END).strip()
-            print(f"Encoding text: {text}")
-        else:
-            print("Encoding file")
+    def decode(self, tabsName):
+        imagePath = self.imagePaths[tabsName]  # Get the selected image path for this tab
 
-    def decode(self, tab):
-        if self.text_option.get() == "text":
-            text = self.text_entry.get("1.0", tk.END).strip()
-            print(f"Decoding text: {text}")
-        else:
-            print("Decoding file")
+        if not imagePath:
+            self.showTextInWindow("Musisz wybrać zdjęcie")
+            print("Musisz wybrać zdjęcie")  # Prompt to select an image
+            return
 
-    def load_file(self):
-        file_path = filedialog.askopenfilename()
-        if file_path:
-            with open(file_path, 'r') as file:
-                content = file.read()
-                self.text_entry.delete("1.0", tk.END)
-                self.text_entry.insert(tk.END, content)
+        result = ""
+        match tabsName:
+            case "LSB":
+                pass
+            case "FiveModulus":
+                result = fiveModulusDecoding(imagePath) 
+            case "EdgeLSB":
+                pass
+        self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
+        print("Zakodowana wiadomość to: ", result)
 
-    def select_image(self):
-        # Function to select an image file from the filesystem
-        file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
-        if file_path:
-            print(f"Selected image: {file_path}")
+    def selectImage(self, tabsName):
+        # Function to select an image file for the specific tab
+        filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png;*.jpg;*.jpeg")])
+        if filePath:
+            print(f"Selected image in {tabsName}: {filePath}")
+            # Update the image path for this tab
+            self.imagePaths[tabsName] = filePath
+            # Update the label to show the selected image's path
+            self.imagePathLabels[tabsName].config(text=f"Wybrane zdjęcie: {filePath.split('/')[-1]}")  # Display the selected image path
 
 if __name__ == "__main__":
     root = tk.Tk()
