@@ -19,7 +19,10 @@ def squareEncoding(square, letter):
         sys.exit(1)
     reminder = (letter - 31) // 25 + 1
     position = (letter - 31) % 25
-    square[position % 5][position // 5] += reminder 
+    if square[position % 5][position // 5] + reminder > 255: 
+        square[position % 5][position // 5] += reminder - 5
+    else:
+        square[position % 5][position // 5] += reminder
     return square
 
 def squareDecoding(square):
@@ -37,6 +40,8 @@ def squareDecoding(square):
             if square[row][column] % 5 != 0:
                 reminder = square[row][column] % 5 - 1
                 position = column * 5 + row 
+                if chr(position + (reminder) * 25 + 31) == "I":
+                    print(square)
                 return chr(position + (reminder) * 25 + 31)
     return "-1"
 
