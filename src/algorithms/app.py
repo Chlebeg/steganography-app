@@ -1,6 +1,6 @@
 import tkinter as tk
-from fiveModulus import *
-from lsbRGB import *
+import fiveModulus as fm
+import lsbRGB as lsbRGB
 from tkinter import ttk, filedialog
 
 class App:
@@ -112,9 +112,9 @@ class App:
         if text:
             match tabsName:
                 case "LSB":
-                    pass
+                    lsbRGB.encode_message(imagePath, text)
                 case "FiveModulus":
-                    fiveModulusEncoding(imagePath, text) 
+                    fm.fiveModulusEncoding(imagePath, text) 
                 case "EdgeLSB":
                     pass
             print(f"Encoding text in {tabsName} tab: {text}")
@@ -132,9 +132,9 @@ class App:
         result = ""
         match tabsName:
             case "LSB":
-                pass
+                result = lsbRGB.decode_message(imagePath)
             case "FiveModulus":
-                result = fiveModulusDecoding(imagePath) 
+                result = fm.fiveModulusDecoding(imagePath) 
             case "EdgeLSB":
                 pass
         self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")

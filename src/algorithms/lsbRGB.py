@@ -49,22 +49,32 @@ def encode_message(image_path, message):
     img.save(encoded_image_path)
     print(f'Message encoded in {encoded_image_path}')
 
-def decode_message(image_path):
-    img = Image.open(image_path)
-    pixels = img.load()
-
+def decode_from_image(img, pixels, length):
     bits = ''
     for y in range(img.height):
         for x in range(img.width):
+            if length <= len(bits):
+                return bits
             r, g, b = pixels[x, y]
 
             # Extract 2 bits from R, 2 bits from G, and 4 bits from B
             bits += f'{r & 0b00000011:02b}'
             bits += f'{g & 0b00000011:02b}'
             bits += f'{b & 0b00001111:04b}'
+    return bits
 
-    # Read the message length (first 32 bits)
-    message_length = int(bits[:32], 2)
+def decode_message(image_path):
+    img = Image.open(image_path)
+    pixels = img.load()
+
+    bits = ''
+    # Read first 32 bits - message length
+    bits += decode_from_image(img, pixels, 32)
+    message_length = int(bits, 2)
+
+    bits = ''
+    # Read the message
+    bits += decode_from_image(img, pixels, 32+message_length)
     message_bits = bits[32:32 + message_length]
 
     return bits_to_message(message_bits)
