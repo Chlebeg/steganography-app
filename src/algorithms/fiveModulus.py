@@ -90,7 +90,7 @@ def printPixels(pixels):
         for x in range(min(10, w)):
             print(f"Pixel ({x}, {y}): {pixels[y, x]}")  # Print RGB values for each pixel
 
-def fiveModulusEncoding(imagePath, secret_message):
+def encode(imagePath, secret_message):
     """
     Encodes a secret message into the red channel of the pixel array by modifying
     red values in blocks of 5x5 pixels.
@@ -129,7 +129,7 @@ def fiveModulusEncoding(imagePath, secret_message):
         print("Error: Expected an RGB image.")
     pixelsToImage(pixels, "outputFiveModulus.png") 
 
-def fiveModulusDecoding(imagePath):
+def decode(imagePath):
     """
     Decodes a secret message from the red channel of the pixel array by reading 
     the red values in blocks of 5x5 pixels.
@@ -179,14 +179,14 @@ if __name__ == "__main__":
     if option == "-d":
         try:
             pixels = imageToPixels(image_path)
-            print(fiveModulusDecoding(pixels))
+            print(decode(pixels))
         except Exception as e:
             print(f"Error: {e}")
             sys.exit(1)
     elif option == "-e":
         try:
             secret_message = input("Enter a secret message to encode in the image: ")
-            pixels = fiveModulusEncoding(image_path, secret_message)
+            pixels = encode(image_path, secret_message)
             output_image_path = "output_image.png"
             pixelsToImage(pixels, output_image_path)
         except Exception as e:

@@ -1,4 +1,5 @@
 import tkinter as tk
+import LSBInEdges as lsbE
 import fiveModulus as fm
 import lsbRGB as lsbRGB
 from tkinter import ttk, filedialog
@@ -112,11 +113,11 @@ class App:
         if text:
             match tabsName:
                 case "LSB":
-                    lsbRGB.encode_message(imagePath, text)
+                    lsbRGB.encode(imagePath, text)
                 case "FiveModulus":
-                    fm.fiveModulusEncoding(imagePath, text) 
+                    fm.encode(imagePath, text) 
                 case "EdgeLSB":
-                    pass
+                    lsbE.encode(imagePath,text)
             print(f"Encoding text in {tabsName} tab: {text}")
         else:
             print("No text entered for encoding")
@@ -130,15 +131,18 @@ class App:
             return
 
         result = ""
-        match tabsName:
-            case "LSB":
-                result = lsbRGB.decode_message(imagePath)
-            case "FiveModulus":
-                result = fm.fiveModulusDecoding(imagePath) 
-            case "EdgeLSB":
-                pass
-        self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
-        print("Zakodowana wiadomość to: ", result)
+        try:
+            match tabsName:
+                case "LSB":
+                    result = lsbRGB.decode(imagePath)
+                case "FiveModulus":
+                    result = fm.decode(imagePath) 
+                case "EdgeLSB":
+                    result = lsbE.decode(imagePath)
+            self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
+            print("Zakodowana wiadomość to: ", result)
+        except:
+            self.showTextInWindow("W zdjęciu nie ma zakodowanej wiadomości")
 
     def selectImage(self, tabsName):
         # Function to select an image file for the specific tab

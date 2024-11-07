@@ -20,14 +20,12 @@ def embedMessageInEdges(image, message, edgeMap, key):
     Returns:
     - Modified image with the embedded message.
     """
-    #np.random.seIed(key)  # Set the random seed for reproducibility
+    np.random.seed(key)  # Set the random seed for reproducibility
     edgePixels = np.argwhere(edgeMap != 0)  # Get coordinates of edge pixels
-    print(edgePixels)
-    #np.random.shuffle(edgePixels)  # Shuffle the edge pixels for random embedding
+    np.random.shuffle(edgePixels)  # Shuffle the edge pixels for random embedding
 
     # Convert the message into a binary string
     binaryMessage = ''.join(format(ord(char), '08b') for char in message)
-    print(binaryMessage)
     binaryMessage += "1000000000000001"
     
     if len(binaryMessage) > len(edgePixels) * 2:
@@ -43,6 +41,28 @@ def embedMessageInEdges(image, message, edgeMap, key):
         image[pixelX, pixelY] = newPixelValue
 
     return image
+
+def encode(imagePath,text):
+    thHigh = 192
+    thLow = 63
+    kernelSize = 3
+    # Load grayscale image
+    image = cv2.imread(imagePath, cv2.IMREAD_GRAYSCALE)
+    processed_image = np.right_shift(image, 2) * 4
+    edges = cannyEdgeDetection(processed_image, thHigh, thLow, kernelSize)
+    stegoImage = embedMessageInEdges(image, text, edges, key=42)
+    cv2.imwrite("outputLSBInEdges.png", stegoImage)
+
+def decode(imagePath):
+    thHigh = 192
+    thLow = 63
+    kernelSize = 3
+    # Load grayscale image
+    image = cv2.imread(imagePath, cv2.IMREAD_GRAYSCALE)
+    processed_image = np.right_shift(image, 2) * 4
+    edges = cannyEdgeDetection(processed_image, thHigh, thLow, kernelSize)
+    extractedMessage = extractMessageFromEdges(image, edges, key=42)
+    return extractedMessage
 
 def showEdges(image, edges):
     """Show the image with detected edges."""
@@ -67,10 +87,9 @@ def extractMessageFromEdges(image, edgeMap, key):
     Returns:
     - Extracted message.
     """
-    #np.random.seed(key)  # Set the random seed for reproducibility
+    np.random.seed(key)  # Set the random seed for reproducibility
     edgePixels = np.argwhere(edgeMap != 0)
-    print(edgePixels)
-    #np.random.shuffle(edgePixels)  # Shuffle edge pixels in the same way as during embedding
+    np.random.shuffle(edgePixels)  # Shuffle edge pixels in the same way as during embedding
 
     binaryMessage = ""
 
@@ -83,7 +102,7 @@ def extractMessageFromEdges(image, edgeMap, key):
         binaryMessage += format(pixelValue & 0b11, '02b')
         i = i + 2
     binaryMessage = binaryMessage[:-16]
-    print(len(binaryMessage)/8)
+    #print(len(binaryMessage)/8)
 
     # Convert the binary message to a string
     message = ''.join(chr(int(binaryMessage[i:i+8], 2)) for i in range(0, len(binaryMessage), 8))
@@ -96,8 +115,8 @@ if __name__ == "__main__":
     a secret message in an image.
     """
     # Edge detection
-    thHigh = 100
-    thLow = 90
+    thHigh = 192
+    thLow = 63
     kernelSize = 3
     if len(sys.argv) != 3:
         print("Usage: python program.py [-d <image_path>] or [-e <image_path>]")
@@ -107,8 +126,9 @@ if __name__ == "__main__":
     image_path = sys.argv[2]
     # Load grayscale image
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    edges = cannyEdgeDetection(image, thHigh, thLow, kernelSize)
-    showEdges(image,edges)
+    processed_image = np.right_shift(image, 2) * 4
+    edges = cannyEdgeDetection(processed_image, thHigh, thLow, kernelSize)
+    #showEdges(image,edges)
     
     if option == "-d":
         try:

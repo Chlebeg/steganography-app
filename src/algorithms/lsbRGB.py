@@ -2,54 +2,54 @@ import sys
 from PIL import Image
 import os
 
-def message_to_bits(message):
+def messageToBits(message):
     # Convert the message to a bit string
     bits = ''.join([f'{ord(c):08b}' for c in message])
     return bits
 
-def bits_to_message(bits):
+def bitsToMessage(bits):
     # Convert the bit string back to the message
     chars = [chr(int(bits[i:i+8], 2)) for i in range(0, len(bits), 8)]
     return ''.join(chars)
 
-def encode_into_image(img, pixels, bits):
-    bit_idx = 0
+def encodeIntoImage(img, pixels, bits):
+    bitIdx = 0
     for y in range(img.height):
         for x in range(img.width):
-            if bit_idx >= len(bits):
+            if bitIdx >= len(bits):
                 return
             
             r, g, b = pixels[x, y]
             # Hide 2 bits in R, 2 bits in G, and 4 bits in B
-            if bit_idx < len(bits):
-                r = (r & 0b11111100) | int(bits[bit_idx:bit_idx+2], 2)
-                bit_idx += 2
-            if bit_idx < len(bits):
-                g = (g & 0b11111100) | int(bits[bit_idx:bit_idx+2], 2)
-                bit_idx += 2
-            if bit_idx < len(bits):
-                b = (b & 0b11110000) | int(bits[bit_idx:bit_idx+4], 2)
-                bit_idx += 4
+            if bitIdx < len(bits):
+                r = (r & 0b11111100) | int(bits[bitIdx:bitIdx+2], 2)
+                bitIdx += 2
+            if bitIdx < len(bits):
+                g = (g & 0b11111100) | int(bits[bitIdx:bitIdx+2], 2)
+                bitIdx += 2
+            if bitIdx < len(bits):
+                b = (b & 0b11110000) | int(bits[bitIdx:bitIdx+4], 2)
+                bitIdx += 4
             pixels[x, y] = (r, g, b)
     return
 
-def encode_message(image_path, message):
-    img = Image.open(image_path)
+def encode(imagePath, message):
+    img = Image.open(imagePath)
     pixels = img.load()
 
-    bits = message_to_bits(message)
-    message_length = f'{len(bits):032b}'  # 32 bits for the message length
-    bits = message_length + bits  # Add message length at the beginning
+    bits = messageToBits(message)
+    messageLength = f'{len(bits):032b}'  # 32 bits for the message length
+    bits = messageLength + bits  # Add message length at the beginning
 
-    encode_into_image(img, pixels, bits)
+    encodeIntoImage(img, pixels, bits)
 
     # Save the new image with '_encoded' appended to the original file name
-    file_name, ext = os.path.splitext(image_path)
-    encoded_image_path = f'{file_name}_encoded{ext}'
-    img.save(encoded_image_path)
-    print(f'Message encoded in {encoded_image_path}')
+    fileName, ext = os.path.splitext(imagePath)
+    encodedImagePath = f'{fileName}_encoded{ext}'
+    img.save(encodedImagePath)
+    print(f'Message encoded in {encodedImagePath}')
 
-def decode_from_image(img, pixels, length):
+def decodeFromImage(img, pixels, length):
     bits = ''
     for y in range(img.height):
         for x in range(img.width):
@@ -63,55 +63,55 @@ def decode_from_image(img, pixels, length):
             bits += f'{b & 0b00001111:04b}'
     return bits
 
-def decode_message(image_path):
-    img = Image.open(image_path)
+def decode(imagePath):
+    img = Image.open(imagePath)
     pixels = img.load()
 
     bits = ''
     # Read first 32 bits - message length
-    bits += decode_from_image(img, pixels, 32)
-    message_length = int(bits, 2)
+    bits += decodeFromImage(img, pixels, 32)
+    messageLength = int(bits, 2)
 
     bits = ''
     # Read the message
-    bits += decode_from_image(img, pixels, 32+message_length)
-    message_bits = bits[32:32 + message_length]
+    bits += decodeFromImage(img, pixels, 32+messageLength)
+    messageBits = bits[32:32 + messageLength]
 
-    return bits_to_message(message_bits)
+    return bitsToMessage(messageBits)
 
 def main():
     if len(sys.argv) < 3:
         print('Usage: python ./program.py </path/to/picture> <-c or -d> [-f <file>]')
         sys.exit(1)
 
-    image_path = sys.argv[1]
+    imagePath = sys.argv[1]
     option = sys.argv[2]
 
     if option == '-c':
         if '-f' in sys.argv:
-            file_path = sys.argv[sys.argv.index('-f') + 1]
+            filePath = sys.argv[sys.argv.index('-f') + 1]
             try:
-                with open(file_path, 'r') as file:
+                with open(filePath, 'r') as file:
                     message = file.read()
-                encode_message(image_path, message)
+                encode(imagePath, message)
             except FileNotFoundError:
-                print(f'File {file_path} not found.')
+                print(f'File {filePath} not found.')
         else:
             message = sys.argv[3]
-            encode_message(image_path, message)
+            encode(imagePath, message)
 
     elif option == '-d':
-        decoded_message = decode_message(image_path)
+        decodedMessage = decode(imagePath)
         if '-f' in sys.argv:
-            output_file = sys.argv[sys.argv.index('-f') + 1]
+            outputFile = sys.argv[sys.argv.index('-f') + 1]
             try:
-                with open(output_file, 'w') as file:
-                    file.write(decoded_message)
-                print(f'Decoded message saved to {output_file}')
+                with open(outputFile, 'w') as file:
+                    file.write(decodedMessage)
+                print(f'Decoded message saved to {outputFile}')
             except Exception as e:
                 print(f'Error saving the message: {e}')
         else:
-            print('Decoded message:', decoded_message)
+            print('Decoded message:', decodedMessage)
 
     else:
         print('Invalid option. Use -c for encoding a message, -f for encoding from a file, -d for decoding, or -d -f for saving the decoded message to a file.')
