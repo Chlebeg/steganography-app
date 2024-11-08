@@ -51,7 +51,9 @@ def encode(imagePath,text):
     processed_image = np.right_shift(image, 2) * 4
     edges = cannyEdgeDetection(processed_image, thHigh, thLow, kernelSize)
     stegoImage = embedMessageInEdges(image, text, edges, key=42)
-    cv2.imwrite("outputLSBInEdges.png", stegoImage)
+    extension = imagePath.split("/")[-1].split(".")[1] 
+    outputName = "../../photos/" + imagePath.split("/")[-1].split(".")[0] + "_LSBInEdges." + extension
+    cv2.imwrite(outputName, stegoImage)
 
 def decode(imagePath):
     thHigh = 192

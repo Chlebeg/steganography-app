@@ -44,10 +44,10 @@ def encode(imagePath, message):
     encodeIntoImage(img, pixels, bits)
 
     # Save the new image with '_encoded' appended to the original file name
-    fileName, ext = os.path.splitext(imagePath)
-    encodedImagePath = f'{fileName}_encoded{ext}'
-    img.save(encodedImagePath)
-    print(f'Message encoded in {encodedImagePath}')
+    extension = imagePath.split("/")[-1].split(".")[1] 
+    outputName = "../../photos/" + imagePath.split("/")[-1].split(".")[0] + "_LSBRGB." + extension
+    img.save(outputName)
+    print(f'Message encoded in {outputName}')
 
 def decodeFromImage(img, pixels, length):
     bits = ''

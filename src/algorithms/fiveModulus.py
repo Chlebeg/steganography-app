@@ -127,7 +127,9 @@ def encode(imagePath, secret_message):
                 break
     else:
         print("Error: Expected an RGB image.")
-    pixelsToImage(pixels, "outputFiveModulus.png") 
+    extension = imagePath.split("/")[-1].split(".")[1] 
+    outputName = "../../photos/" + imagePath.split("/")[-1].split(".")[0] + "_fiveModulus." + extension
+    pixelsToImage(pixels, outputName) 
 
 def decode(imagePath):
     """

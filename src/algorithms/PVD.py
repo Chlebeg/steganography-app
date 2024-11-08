@@ -19,7 +19,7 @@ def bitsToMessage(bits):
     chars = [chr(int(bits[i:i + 8], 2)) for i in range(0, len(bits), 8)]
     return ''.join(chars)
 
-def encode(imagePath, message, outputImagePath="embedded_image.png"):
+def encode(imagePath, message):
     img = Image.open(imagePath).convert("L")
     pixels = np.array(img)
     messageBits = messageToBits(message) + '0' * 8  # Append end marker
@@ -59,8 +59,10 @@ def encode(imagePath, message, outputImagePath="embedded_image.png"):
                 bitIdx += n
 
     # Save the modified image
-    Image.fromarray(pixels).save(outputImagePath)
-    print(f"Message embedded in {outputImagePath}")
+    extension = imagePath.split("/")[-1].split(".")[1] 
+    outputName = "../../photos/" + imagePath.split("/")[-1].split(".")[0] + "_PVD." + extension
+    Image.fromarray(pixels).save(outputName)
+    print(f"Message embedded in {outputName}")
 
 def decode(imagePath):
     img = Image.open(imagePath)

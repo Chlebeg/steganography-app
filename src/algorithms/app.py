@@ -122,6 +122,7 @@ class App:
                 case "PVD":
                     pvd.encode(imagePath,text)
             print(f"Encoding text in {tabsName} tab: {text}")
+            print(imagePath.split("/")[-1].split(".")[0])
         else:
             print("No text entered for encoding")
 
