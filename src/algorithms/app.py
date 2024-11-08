@@ -2,6 +2,7 @@ import tkinter as tk
 import LSBInEdges as lsbE
 import fiveModulus as fm
 import lsbRGB as lsbRGB
+import PVD as pvd
 from tkinter import ttk, filedialog
 
 class App:
@@ -20,7 +21,7 @@ class App:
         self.textEntries = {}  # Dictionary to hold text entries for each tab
         self.imagePaths = {}    # Dictionary to hold selected image paths for each tab
         self.imagePathLabels = {}  # Dictionary to hold labels for image paths
-        tabsName = ["LSB", "FiveModulus", "EdgeLSB", "COS", "COS", "COS", "COS"]
+        tabsName = ["LSB", "FiveModulus", "EdgeLSB", "PVD", "COS", "COS", "COS"]
         for i in range(7):
             tab = ttk.Frame(self.notebook)
             self.notebook.add(tab, text=tabsName[i])
@@ -118,6 +119,8 @@ class App:
                     fm.encode(imagePath, text) 
                 case "EdgeLSB":
                     lsbE.encode(imagePath,text)
+                case "PVD":
+                    pvd.encode(imagePath,text)
             print(f"Encoding text in {tabsName} tab: {text}")
         else:
             print("No text entered for encoding")
@@ -139,6 +142,8 @@ class App:
                     result = fm.decode(imagePath) 
                 case "EdgeLSB":
                     result = lsbE.decode(imagePath)
+                case "PVD":
+                    result = pvd.decode(imagePath)
             self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
             print("Zakodowana wiadomość to: ", result)
         except:
