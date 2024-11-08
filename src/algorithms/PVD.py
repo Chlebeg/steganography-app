@@ -24,6 +24,7 @@ def encode(imagePath, message):
     pixels = np.array(img)
     messageBits = messageToBits(message) + '0' * 8  # Append end marker
     bitIdx = 0
+    print(messageBits)
 
     # Traverse the image pixels, skip first row and column
     for y in range(1, img.height):
@@ -33,6 +34,7 @@ def encode(imagePath, message):
 
             # Get current pixel and its neighbors
             currentPixel = pixels[y, x]
+            print(currentPixel)
             leftPixel = pixels[y, x - 1]
             upPixel = pixels[y - 1, x]
             cornerPixel = pixels[y-1,x-1]
@@ -50,6 +52,7 @@ def encode(imagePath, message):
                 dataValue = int(dataBits, 2)
                 # Modify the pixel value
                 newPixelValue = (currentPixel & (0xFF - ((1 << n) - 1))) | dataValue
+                print(currentPixel,newPixelValue)
 
                 # Optimal Pixel Adjustment Process (OPAP)
                #if abs(newPixelValue - currentPixel) > (1 << (n - 1)):
@@ -85,7 +88,9 @@ def decode(imagePath):
             n = calculateDifferencingCapacity(difference)
 
             # Extract `n` bits from the current pixel
+            print(currentPixel, n)
             extractedBits += f'{currentPixel & ((1 << n) - 1):0{n}b}'
+            print(extractedBits)
             if '00000000' in extractedBits:
                 # Convert bit string to message
                 message = bitsToMessage(extractedBits)
@@ -98,6 +103,6 @@ def decode(imagePath):
 
 if __name__ == "__main__":
     # Usage example:
-    encode("../../photos/photo2.jpg", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaujSecret Message")
-    decodedMessage = decode("embedded_image.png")
+    encode("../../photos/photo4.jpg", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaujSecret Message")
+    decodedMessage = decode("./../../photos/photo4_PVD.jpg")
     print("Decoded message:", decodedMessage)

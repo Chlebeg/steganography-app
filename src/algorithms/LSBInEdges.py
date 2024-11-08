@@ -98,6 +98,7 @@ def extractMessageFromEdges(image, edgeMap, key):
     # Extract the message bits from the edge pixels
     i = 0
     while binaryMessage[-16:] != "1000000000000001":
+        print(binaryMessage)
         pixelX, pixelY = edgePixels[i // 2]
         pixelValue = image[pixelX, pixelY]
         # Extract the two least significant bits

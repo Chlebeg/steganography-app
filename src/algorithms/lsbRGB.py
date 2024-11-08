@@ -39,6 +39,7 @@ def encode(imagePath, message):
 
     bits = messageToBits(message)
     messageLength = f'{len(bits):032b}'  # 32 bits for the message length
+    print(messageLength)
     bits = messageLength + bits  # Add message length at the beginning
 
     encodeIntoImage(img, pixels, bits)
@@ -70,7 +71,11 @@ def decode(imagePath):
     bits = ''
     # Read first 32 bits - message length
     bits += decodeFromImage(img, pixels, 32)
+    print(bits)
     messageLength = int(bits, 2)
+    print(messageLength)
+  # if messageLength > 1000000:
+  #     return "ERROR"
 
     bits = ''
     # Read the message
