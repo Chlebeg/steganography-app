@@ -1,6 +1,9 @@
-import cv2
+import os
 import sys
+from pathlib import Path
+import cv2
 import numpy as np
+
 
 def cannyEdgeDetection(image, thHigh, thLow, kernelSize):
     """Detect edges using Canny edge detection."""
@@ -51,9 +54,11 @@ def encode(imagePath,text):
     processed_image = np.right_shift(image, 2) * 4
     edges = cannyEdgeDetection(processed_image, thHigh, thLow, kernelSize)
     stegoImage = embedMessageInEdges(image, text, edges, key=42)
-    extension = imagePath.split("/")[-1].split(".")[1] 
-    outputName = "../../photos/" + imagePath.split("/")[-1].split(".")[0] + "_LSBInEdges." + extension
-    cv2.imwrite(outputName, stegoImage)
+    
+    outputPath = os.path.join(Path(imagePath).parent, Path(imagePath).stem + "_lsbInEdges" + Path(imagePath).suffix)
+    cv2.imwrite(outputPath, stegoImage)
+    print(f'Message encoded in {outputPath}')
+    return outputPath
 
 def decode(imagePath):
     thHigh = 192
@@ -98,14 +103,12 @@ def extractMessageFromEdges(image, edgeMap, key):
     # Extract the message bits from the edge pixels
     i = 0
     while binaryMessage[-16:] != "1000000000000001":
-        print(binaryMessage)
         pixelX, pixelY = edgePixels[i // 2]
         pixelValue = image[pixelX, pixelY]
         # Extract the two least significant bits
         binaryMessage += format(pixelValue & 0b11, '02b')
         i = i + 2
     binaryMessage = binaryMessage[:-16]
-    #print(len(binaryMessage)/8)
 
     # Convert the binary message to a string
     message = ''.join(chr(int(binaryMessage[i:i+8], 2)) for i in range(0, len(binaryMessage), 8))

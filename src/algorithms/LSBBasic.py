@@ -1,6 +1,8 @@
-import sys
-from PIL import Image
 import os
+import sys
+from pathlib import Path
+from PIL import Image
+
 
 def messageToBits(message):
     # Convert the message to a bit string
@@ -44,11 +46,11 @@ def encode(imagePath, message):
 
     encodeIntoImage(img, pixels, bits)
 
-    # Save the new image with '_encoded' appended to the original file name
-    extension = imagePath.split("/")[-1].split(".")[1] 
-    outputName = "../../photos/" + imagePath.split("/")[-1].split(".")[0] + "_LSBRGB." + extension
-    img.save(outputName)
-    print(f'Message encoded in {outputName}')
+    # Save the new image with '_lsbBasic' appended to the original file name
+    outputPath = os.path.join(Path(imagePath).parent, Path(imagePath).stem + "_lsbBasic" + Path(imagePath).suffix)
+    img.save(outputPath)
+    print(f'Message encoded in {outputPath}')
+    return outputPath
 
 def decodeFromImage(img, pixels, length):
     bits = ''
@@ -68,17 +70,15 @@ def decode(imagePath):
     img = Image.open(imagePath)
     pixels = img.load()
 
-    bits = ''
     # Read first 32 bits - message length
-    bits += decodeFromImage(img, pixels, 32)
-    print(bits)
-    messageLength = int(bits, 2)
-    print(messageLength)
-  # if messageLength > 1000000:
-  #     return "ERROR"
-
     bits = ''
+    bits += decodeFromImage(img, pixels, 32)
+    messageLength = int(bits, 2)
+    if messageLength > 1000000:
+        return "ERROR"
+
     # Read the message
+    bits = ''
     bits += decodeFromImage(img, pixels, 32+messageLength)
     messageBits = bits[32:32 + messageLength]
 

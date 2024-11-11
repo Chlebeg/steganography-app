@@ -1,5 +1,7 @@
+import os
 import sys
 from PIL import Image
+from pathlib import Path
 import numpy as np
 
 def squareEncoding(square, letter):
@@ -98,9 +100,6 @@ def encode(imagePath, secret_message):
     Parameters:
     imagePath (str): Path to the image
     secret_message (str): The secret message to encode.
-    
-    Returns:
-    Nothing
     """
     pixels = imageToPixels(imagePath)
     secret_message = secret_message.replace("\n", " ")
@@ -127,9 +126,9 @@ def encode(imagePath, secret_message):
                 break
     else:
         print("Error: Expected an RGB image.")
-    extension = imagePath.split("/")[-1].split(".")[1] 
-    outputName = "../../photos/" + imagePath.split("/")[-1].split(".")[0] + "_fiveModulus." + extension
-    pixelsToImage(pixels, outputName) 
+    outputPath = os.path.join(Path(imagePath).parent, Path(imagePath).stem + "_fiveModulus" + Path(imagePath).suffix)
+    pixelsToImage(pixels, outputPath)
+    return outputPath
 
 def decode(imagePath):
     """
