@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image, ImageTk
 
 import algorithms.fiveModulus as fm
+import algorithms.fiveModulusWithTwist as fmt
 import algorithms.LSBBasic as lsbB
 import algorithms.LSBInEdges as lsbE
 import algorithms.PVD as pvd
@@ -27,7 +28,7 @@ class App:
         self.textEntries = {}  
         self.imagePaths = {}    
         self.imagePathLabels = {}
-        tabsName = ["BasicLSB", "FiveModulus", "EdgeLSB", "PVD", "Comparison"]
+        tabsName = ["BasicLSB", "FiveModulus", "EdgeLSB", "PVD","FiveModulusWithTwist","Comparison"]
 
         for i in range(len(tabsName)):
             tab = ttk.Frame(self.notebook)
@@ -209,6 +210,9 @@ class App:
                     outputName = lsbE.encode(imagePath,text)
                 case "PVD":
                     outputName = pvd.encode(imagePath,text)
+                case "FiveModulusWithTwist":
+                    outputName = fmt.encode(imagePath,text)
+
             self.imagePaths[tabsName] = outputName
             self.imagePathLabels[tabsName].config(text=f"Zdjęcie zakodowane do: {Path(outputName).name}")
             print(f"Encoding text in {tabsName} tab: {text}")
@@ -235,6 +239,8 @@ class App:
                     result = lsbE.decode(imagePath)
                 case "PVD":
                     result = pvd.decode(imagePath)
+                case "FiveModulusWithTwist":
+                    result = fmt.decode(imagePath)
             self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
             print("Encoded message: ", result)
         except:

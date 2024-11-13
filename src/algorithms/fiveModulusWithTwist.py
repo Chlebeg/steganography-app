@@ -4,12 +4,12 @@ from PIL import Image
 from pathlib import Path
 import numpy as np
 
-def squareEncoding(square, letter):
+def squaresEncoding(squares, letter):
     """
-    Encodes a character into a 5x5 square by modifying the red channel values.
+    Encodes a character into a 3x3 square by modifying the red channel values.
     
     Parameters:
-    square (numpy array): A 5x5 array representing a portion of the image's red channel.
+    square (numpy array): A 3x3 array representing a portion of the image's red channel.
     letter (str): The character to encode into the square.
     
     Returns:
@@ -21,28 +21,30 @@ def squareEncoding(square, letter):
         sys.exit(1)
     reminder = (letter - 31) // 25 + 1
     position = (letter - 31) % 25
-    if square[position % 5][position // 5] + reminder > 255: 
-        square[position % 5][position // 5] += reminder - 5
+    square = position//9
+    if squares[square][position % 3][(position - square*9) // 3] + reminder > 255: 
+        squares[square][position % 3][(position - square*9) // 3] += reminder - 5
     else:
-        square[position % 5][position // 5] += reminder
-    return square
+        squares[square][position % 3][(position - square*9)// 3] += reminder
+    return squares
 
-def squareDecoding(square):
+def squaresDecoding(squares):
     """
-    Decodes a character from a 5x5 square by reading the red channel values.
+    Decodes a character from a 3x3 square by reading the red channel values.
     
     Parameters:
-    square (numpy array): A 5x5 array representing a portion of the image's red channel.
+    square (numpy array): A 3x3 array representing a portion of the image's red channel.
     
     Returns:
     str: The decoded character or '-1' if no character is found.
     """
-    for column in range(5):
-        for row in range(5): 
-            if square[row][column] % 5 != 0:
-                reminder = square[row][column] % 5 - 1
-                position = column * 5 + row 
-                return chr(position + (reminder) * 25 + 31)
+    for square in range(3):
+        for column in range(3):
+            for row in range(3): 
+                if squares[square][row][column] % 5 != 0:
+                    reminder = squares[square][row][column] % 5 - 1
+                    position = 9 * square + column * 3 + row 
+                    return chr(position + (reminder) * 25 + 31)
     return "-1"
 
 def imageToPixels(imagePath):
@@ -93,7 +95,7 @@ def printPixels(pixels):
 def encode(imagePath, secretMessage):
     """
     Encodes a secret message into the red channel of the pixel array by modifying
-    red values in blocks of 5x5 pixels.
+    red values in blocks of 3x3 pixels.
     
     Parameters:
     imagePath (str): Path to the image
@@ -103,20 +105,29 @@ def encode(imagePath, secretMessage):
     secretMessage = secretMessage.replace("\n", " ")
     if len(pixels.shape) == 3 and pixels.shape[2] == 3:
         redLayer = pixels[:, :, 0]
+        greenLayer = pixels[:, :, 1]
+        blueLayer = pixels[:, :, 2]
         
         modifiedRedLayer = np.round(redLayer / 5) * 5
+        modifiedGreenLayer = np.round(greenLayer / 5) * 5
+        modifiedBlueLayer = np.round(blueLayer / 5) * 5
         
         pixels[:, :, 0] = modifiedRedLayer.astype(np.uint8)
+        pixels[:, :, 1] = modifiedGreenLayer.astype(np.uint8)
+        pixels[:, :, 2] = modifiedBlueLayer.astype(np.uint8)
         height, width, _ = pixels.shape
     
-        maxHeight = (height // 5) * 5
-        maxWidth = (width // 5) * 5
+        maxHeight = (height // 3) * 3
+        maxWidth = (width // 3) * 3
         
         i = 0
-        for y in range(0, maxHeight, 5):
-            for x in range(0, maxWidth, 5):
-                square = pixels[y:y+5, x:x+5, 0]
-                pixels[y:y+5, x:x+5, 0] = squareEncoding(square, secretMessage[i])
+        for y in range(0, maxHeight, 3):
+            for x in range(0, maxWidth, 3):
+                squares = [pixels[y:y+3, x:x+3, i] for i in range(3)]
+                squares = squaresEncoding(squares, secretMessage[i])
+                pixels[y:y+3, x:x+3, 0] = squares[0]
+                pixels[y:y+3, x:x+3, 1] = squares[1]
+                pixels[y:y+3, x:x+3, 2] = squares[2]
                 if i == len(secretMessage) - 1:
                     break
                 i += 1
@@ -124,14 +135,14 @@ def encode(imagePath, secretMessage):
                 break
     else:
         print("Error: Expected an RGB image.")
-    outputPath = os.path.join(Path(imagePath).parent, Path(imagePath).stem + "_fiveModulus" + Path(imagePath).suffix)
+    outputPath = os.path.join(Path(imagePath).parent, Path(imagePath).stem + "_fiveModulusWithTwist" + Path(imagePath).suffix)
     pixelsToImage(pixels, outputPath)
     return outputPath
 
 def decode(imagePath):
     """
     Decodes a secret message from the red channel of the pixel array by reading 
-    the red values in blocks of 5x5 pixels.
+    the red values in blocks of 3x3 pixels.
     
     Parameters:
     imagePath (str): Path to the image
@@ -144,15 +155,15 @@ def decode(imagePath):
     if len(pixels.shape) == 3 and pixels.shape[2] == 3:
         height, width, _ = pixels.shape
     
-        maxHeight = (height // 5) * 5
-        maxWidth = (width // 5) * 5
+        maxHeight = (height // 3) * 3
+        maxWidth = (width // 3) * 3
         
         i = 0
         letter = ""
-        for y in range(0, maxHeight, 5):
-            for x in range(0, maxWidth, 5):
-                square = pixels[y:y+5, x:x+5, 0]
-                letter = squareDecoding(square)
+        for y in range(0, maxHeight, 3):
+            for x in range(0, maxWidth, 3):
+                squares = [ pixels[y:y+3, x:x+3, i] for i in range(3)]
+                letter = squaresDecoding(squares)
                 if letter == "-1":
                     break
                 result += letter
@@ -178,16 +189,14 @@ if __name__ == "__main__":
     if option == "-d":
         try:
             pixels = imageToPixels(imagePath)
-            print(decode(pixels))
+            print(decode(imagePath))
         except Exception as e:
             print(f"Error: {e}")
             sys.exit(1)
     elif option == "-e":
         try:
             secretMessage = input("Enter a secret message to encode in the image: ")
-            pixels = encode(imagePath, secretMessage)
-            outputImagePath = "output_image.png"
-            pixelsToImage(pixels, outputImagePath)
+            encode(imagePath, secretMessage)
         except Exception as e:
             print(f"Error: {e}")
             sys.exit(1)
