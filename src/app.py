@@ -1,4 +1,7 @@
+import webview
+import os
 import tkinter as tk
+from tkinterhtml import HtmlFrame
 from pathlib import Path
 from tkinter import filedialog, ttk
 
@@ -57,7 +60,7 @@ class App:
 
         encodeButton = tk.Button(buttonFrame, text="Kodowanie", width=15, command=lambda: self.encode(tabsName))
         decodeButton = tk.Button(buttonFrame, text="Dekodowanie", width=15, command=lambda: self.decode(tabsName))
-        infoButton = tk.Button(buttonFrame, text="Info", command=lambda: self.showInfo())
+        infoButton = tk.Button(buttonFrame, text="Info", command=lambda: self.showInfo(tabsName))
 
         encodeButton.grid(row=0, column=0, padx=20, pady=5, sticky="ew")
         infoButton.grid(row=0, column=1, padx=20, pady=5, sticky="ew")
@@ -88,7 +91,7 @@ class App:
         self.encodingTime[tabsName] = encodingTime
         self.imagePaths[tabsName] = ""
 
-        characterLimit = tk.Label(tab, text="Możliwa ilość znaków, które można zakodować: N/A", fg="green")
+        characterLimit = tk.Label(tab, text="", fg="green")
         characterLimit.grid(row=6, column=0, padx=10, pady=10, sticky="ew")
         self.characterLimit[tabsName] = characterLimit
 
@@ -117,22 +120,28 @@ class App:
         self.characterLimit[tabsName].config(text=f"Możliwa ilość znaków, które można zakodować: {specialValue}")
 
 
-    def showInfo(self):
-        """
-        showInfo - function to show window containing info about algorithm
-        """
-        infoWindow = tk.Toplevel(self.root)
-        infoWindow.title("Informacje")
-        
-        # Create a label with information text
-        infoText = tk.Label(infoWindow, text="This is an application for steganography.\n\n"
-                                            "Use the buttons to encode or decode messages in images.\n"
-                                            "Select an image using 'Wybierz zdjęcie' button.")
-        infoText.pack(padx=20, pady=20)
 
-        # Add a close button
-        closeButton = tk.Button(infoWindow, text="Close", command=infoWindow.destroy)
-        closeButton.pack(pady=5)
+    def showInfo(self, tabsName):
+        """
+        showInfo - function to show window containing info about algorithm from an HTML file
+        using pywebview to render HTML content in a separate window.
+        """
+        print("TEST")
+        # Ustal ścieżkę do pliku HTML na podstawie tabsName
+        htmlFilePath = f"{tabsName}.html"
+        htmlFilePath = os.path.abspath(htmlFilePath)
+
+        # Sprawdź, czy plik istnieje
+        if not os.path.isfile(htmlFilePath):
+            self.showTextInWindow("Plik HTML nie znaleziony. Upewnij się, że plik istnieje.")
+            return
+
+        # Wywołanie pywebview bezpośrednio bez wątkowania
+        webview.create_window("Informacje", htmlFilePath)
+
+        # Zamiast uruchamiać pywebview w innym wątku, uruchommy go w głównym wątku
+        webview.start()
+
 
     def createComparisonTab(self, tab):
         """
