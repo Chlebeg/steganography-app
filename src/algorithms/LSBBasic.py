@@ -35,6 +35,11 @@ def encodeIntoImage(img, pixels, bits):
             pixels[x, y] = (r, g, b)
     return
 
+def countCharacterLimit(imagePath):
+    img = Image.open(imagePath)
+    result = img.height * img.width
+    return result
+
 def encode(imagePath, message):
     img = Image.open(imagePath)
     pixels = img.load()

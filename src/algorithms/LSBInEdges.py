@@ -45,6 +45,18 @@ def embedMessageInEdges(image, message, edgeMap, key):
 
     return image
 
+def countCharacterLimit(imagePath):
+    thHigh = 192
+    thLow = 63
+    kernelSize = 3
+    # Load grayscale image
+    image = cv2.imread(imagePath, cv2.IMREAD_GRAYSCALE)
+    processed_image = np.right_shift(image, 2) * 4
+    edges = cannyEdgeDetection(processed_image, thHigh, thLow, kernelSize)
+    edgePixels = np.argwhere(edges != 0)  # Get coordinates of edge pixels
+    result = len(edgePixels)//4-2 
+    return result
+
 def encode(imagePath,text):
     thHigh = 192
     thLow = 63

@@ -90,6 +90,14 @@ def printPixels(pixels):
         for x in range(min(10, w)):
             print(f"Pixel ({x}, {y}): {pixels[y, x]}")  # Print RGB values for each pixel
 
+def countCharacterLimit(imagePath):
+    pixels = imageToPixels(imagePath)
+    if len(pixels.shape) == 3 and pixels.shape[2] == 3:
+        height, width, _ = pixels.shape
+    
+        result = (height // 5) * (width // 5)  
+    return result     
+    
 def encode(imagePath, secretMessage):
     """
     Encodes a secret message into the red channel of the pixel array by modifying

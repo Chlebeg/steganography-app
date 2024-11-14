@@ -22,6 +22,11 @@ def bitsToMessage(bits):
     chars = [chr(int(bits[i:i + 8], 2)) for i in range(0, len(bits), 8)]
     return ''.join(chars)
 
+def countCharacterLimit(imagePath):
+    img = Image.open(imagePath).convert("L")
+    result = (img.height-1) * (img.width -1) - 1 
+    return result
+
 def encode(imagePath, message):
     img = Image.open(imagePath).convert("L")
     pixels = np.array(img)

@@ -91,6 +91,14 @@ def printPixels(pixels):
     for y in range(min(10, h)):
         for x in range(min(10, w)):
             print(f"Pixel ({x}, {y}): {pixels[y, x]}")  # Print RGB values for each pixel
+def countCharacterLimit(imagePath):
+    pixels = imageToPixels(imagePath)
+    if len(pixels.shape) == 3 and pixels.shape[2] == 3:
+        height, width, _ = pixels.shape
+    
+        result = (height // 3) * (width // 3)  
+    return result     
+    
 
 def encode(imagePath, secretMessage):
     """

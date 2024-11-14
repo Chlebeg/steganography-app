@@ -5,6 +5,7 @@ from tkinter import filedialog, ttk
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
+import time
 
 import algorithms.fiveModulus as fm
 import algorithms.fiveModulusWithTwist as fmt
@@ -28,6 +29,8 @@ class App:
         self.textEntries = {}  
         self.imagePaths = {}    
         self.imagePathLabels = {}
+        self.encodingTime = {}
+        self.characterLimit = {}
         tabsName = ["BasicLSB", "FiveModulus", "EdgeLSB", "PVD","FiveModulusWithTwist","Comparison"]
 
         for i in range(len(tabsName)):
@@ -43,6 +46,7 @@ class App:
         """
         createStegoTab - function to create Stego tabs with encode and decode functions
         """
+        # Istniejący kod
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
@@ -75,9 +79,31 @@ class App:
 
         imagePathLabel = tk.Label(tab, text="", fg="blue")
         imagePathLabel.grid(row=3, column=0, padx=10, pady=5, sticky="ew")
+        encodingTime = tk.Label(tab, text="", fg="red")
+        encodingTime.grid(row=4, column=0, padx=10, pady=5, sticky="ew")
         self.imagePathLabels[tabsName] = imagePathLabel
-
+        self.encodingTime[tabsName] = encodingTime
         self.imagePaths[tabsName] = ""
+
+        # Dodanie pola na wynik specjalnej funkcji
+        characterLimit = tk.Label(tab, text="Możliwa ilość znaków, które można zakodować: N/A", fg="green")
+        characterLimit.grid(row=5, column=0, padx=10, pady=10, sticky="ew")
+        self.characterLimit[tabsName] = characterLimit
+
+    def countCharacterLimit(self, tabsName, imagePath):
+        match tabsName:
+            case "BasicLSB":
+                specialValue = lsbB.countCharacterLimit(imagePath)
+            case "FiveModulus":
+                specialValue = fm.countCharacterLimit(imagePath) 
+            case "EdgeLSB":
+                specialValue = lsbE.countCharacterLimit(imagePath)
+            case "PVD":
+                specialValue = pvd.countCharacterLimit(imagePath)
+            case "FiveModulusWithTwist":
+                specialValue = fmt.countCharacterLimit(imagePath)
+        self.characterLimit[tabsName].config(text=f"Możliwa ilość znaków, które można zakodować: {specialValue}")
+
 
     def showInfo(self):
         """
@@ -199,8 +225,8 @@ class App:
             self.showTextInWindow("Musisz wybrać zdjęcie")
             print("No image selected")  # Prompt to select an image
             return
-
         if text:
+            start = time.time()
             match tabsName:
                 case "BasicLSB":
                     outputName = lsbB.encode(imagePath, text)
@@ -212,9 +238,11 @@ class App:
                     outputName = pvd.encode(imagePath,text)
                 case "FiveModulusWithTwist":
                     outputName = fmt.encode(imagePath,text)
-
+            end = time.time()
+            print(end-start)
             self.imagePaths[tabsName] = outputName
             self.imagePathLabels[tabsName].config(text=f"Zdjęcie zakodowane do: {Path(outputName).name}")
+            self.encodingTime[tabsName].config(text=f"Zakodowano w {end-start} sekund")
             print(f"Encoding text in {tabsName} tab: {text}")
         else:
             self.showTextInWindow("Wpisz tekst do zakodowania")
@@ -252,6 +280,7 @@ class App:
         if filePath:
             print(f"Selected image in {tabsName}: {filePath}")
             # Update the image path for this tab
+            self.countCharacterLimit(tabsName, filePath)
             self.imagePaths[tabsName] = filePath
             # Update the label to show the selected image's path
             self.imagePathLabels[tabsName].config(text=f"Wybrane zdjęcie: {Path(filePath).name}")  # Display the selected image path
