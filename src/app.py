@@ -46,7 +46,6 @@ class App:
         """
         createStegoTab - function to create Stego tabs with encode and decode functions
         """
-        # Istniejący kod
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
@@ -77,18 +76,31 @@ class App:
         selectImageButton = tk.Button(tab, text="Wybierz zdjęcie", command=lambda: self.selectImage(tabsName))
         selectImageButton.grid(row=2, column=0, pady=10, padx=10, sticky="ew")
 
+        # Nowy przycisk "Import z pliku" poniżej "Wybierz zdjęcie"
+        importButton = tk.Button(tab, text="Import z pliku", command=lambda: self.importTextFromFile(tabsName))
+        importButton.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
+
         imagePathLabel = tk.Label(tab, text="", fg="blue")
-        imagePathLabel.grid(row=3, column=0, padx=10, pady=5, sticky="ew")
+        imagePathLabel.grid(row=4, column=0, padx=10, pady=5, sticky="ew")
         encodingTime = tk.Label(tab, text="", fg="red")
-        encodingTime.grid(row=4, column=0, padx=10, pady=5, sticky="ew")
+        encodingTime.grid(row=5, column=0, padx=10, pady=5, sticky="ew")
         self.imagePathLabels[tabsName] = imagePathLabel
         self.encodingTime[tabsName] = encodingTime
         self.imagePaths[tabsName] = ""
 
-        # Dodanie pola na wynik specjalnej funkcji
         characterLimit = tk.Label(tab, text="Możliwa ilość znaków, które można zakodować: N/A", fg="green")
-        characterLimit.grid(row=5, column=0, padx=10, pady=10, sticky="ew")
+        characterLimit.grid(row=6, column=0, padx=10, pady=10, sticky="ew")
         self.characterLimit[tabsName] = characterLimit
+
+
+    def importTextFromFile(self, tabsName):
+        filePath = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
+        if filePath:
+            with open(filePath, "r", encoding="utf-8") as file:
+                text = file.read()
+                self.textEntries[tabsName].delete("1.0", tk.END)  # Wyczyść pole tekstowe
+                self.textEntries[tabsName].insert(tk.END, text)  # Wstaw tekst do pola
+
 
     def countCharacterLimit(self, tabsName, imagePath):
         match tabsName:
