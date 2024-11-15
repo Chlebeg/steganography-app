@@ -1,3 +1,5 @@
+photos/photo*_*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

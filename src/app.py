@@ -128,7 +128,7 @@ class App:
         """
         print("TEST")
         # Ustal ścieżkę do pliku HTML na podstawie tabsName
-        htmlFilePath = f"{tabsName}.html"
+        htmlFilePath = f"info/{tabsName}.html"
         htmlFilePath = os.path.abspath(htmlFilePath)
 
         # Sprawdź, czy plik istnieje
