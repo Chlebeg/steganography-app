@@ -1,14 +1,14 @@
-import webview
 import os
+import time
 import tkinter as tk
-from tkinterhtml import HtmlFrame
 from pathlib import Path
 from tkinter import filedialog, ttk
 
 import cv2
 import numpy as np
+import webview
 from PIL import Image, ImageTk
-import time
+from tkinterhtml import HtmlFrame
 
 import algorithms.fiveModulus as fm
 import algorithms.fiveModulusWithTwist as fmt
@@ -34,7 +34,7 @@ class App:
         self.imagePathLabels = {}
         self.encodingTime = {}
         self.characterLimit = {}
-        tabsName = ["BasicLSB", "FiveModulus", "EdgeLSB", "PVD","FiveModulusWithTwist","Comparison"]
+        tabsName = ["BasicLSB", "EdgeLSB", "FiveModulus", "FiveModulusWithTwist", "PVD", "Comparison"]
 
         for i in range(len(tabsName)):
             tab = ttk.Frame(self.notebook)
@@ -109,14 +109,14 @@ class App:
         match tabsName:
             case "BasicLSB":
                 specialValue = lsbB.countCharacterLimit(imagePath)
-            case "FiveModulus":
-                specialValue = fm.countCharacterLimit(imagePath) 
             case "EdgeLSB":
                 specialValue = lsbE.countCharacterLimit(imagePath)
-            case "PVD":
-                specialValue = pvd.countCharacterLimit(imagePath)
+            case "FiveModulus":
+                specialValue = fm.countCharacterLimit(imagePath) 
             case "FiveModulusWithTwist":
                 specialValue = fmt.countCharacterLimit(imagePath)
+            case "PVD":
+                specialValue = pvd.countCharacterLimit(imagePath)
         self.characterLimit[tabsName].config(text=f"Możliwa ilość znaków, które można zakodować: {specialValue}")
 
 
@@ -251,14 +251,14 @@ class App:
             match tabsName:
                 case "BasicLSB":
                     outputName = lsbB.encode(imagePath, text)
-                case "FiveModulus":
-                    outputName = fm.encode(imagePath, text) 
                 case "EdgeLSB":
                     outputName = lsbE.encode(imagePath,text)
-                case "PVD":
-                    outputName = pvd.encode(imagePath,text)
+                case "FiveModulus":
+                    outputName = fm.encode(imagePath, text)
                 case "FiveModulusWithTwist":
                     outputName = fmt.encode(imagePath,text)
+                case "PVD":
+                    outputName = pvd.encode(imagePath,text)
             end = time.time()
             print(end-start)
             self.imagePaths[tabsName] = outputName
@@ -282,14 +282,14 @@ class App:
             match tabsName:
                 case "BasicLSB":
                     result = lsbB.decode(imagePath)
-                case "FiveModulus":
-                    result = fm.decode(imagePath) 
                 case "EdgeLSB":
                     result = lsbE.decode(imagePath)
-                case "PVD":
-                    result = pvd.decode(imagePath)
+                case "FiveModulus":
+                    result = fm.decode(imagePath) 
                 case "FiveModulusWithTwist":
                     result = fmt.decode(imagePath)
+                case "PVD":
+                    result = pvd.decode(imagePath)
             self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
             print("Encoded message: ", result)
         except:
