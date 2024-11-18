@@ -14,6 +14,7 @@ import algorithms.fiveModulus as fm
 import algorithms.fiveModulusWithTwist as fmt
 import algorithms.LSBBasic as lsbB
 import algorithms.LSBInEdges as lsbE
+import algorithms.LSBKPoints as lsbK
 import algorithms.PVD as pvd
 
 
@@ -34,7 +35,7 @@ class App:
         self.imagePathLabels = {}
         self.encodingTime = {}
         self.characterLimit = {}
-        tabsName = ["BasicLSB", "EdgeLSB", "FiveModulus", "FiveModulusWithTwist", "PVD", "Comparison"]
+        tabsName = ["BasicLSB", "EdgeLSB", "FiveModulus", "FiveModulusWithTwist", "KPointsLSB", "PVD", "Comparison"]
 
         for i in range(len(tabsName)):
             tab = ttk.Frame(self.notebook)
@@ -115,6 +116,8 @@ class App:
                 specialValue = fm.countCharacterLimit(imagePath) 
             case "FiveModulusWithTwist":
                 specialValue = fmt.countCharacterLimit(imagePath)
+            case "KPointsLSB":
+                specialValue = lsbK.countCharacterLimit(imagePath)
             case "PVD":
                 specialValue = pvd.countCharacterLimit(imagePath)
         self.characterLimit[tabsName].config(text=f"Możliwa ilość znaków, które można zakodować: {specialValue}")
@@ -257,6 +260,8 @@ class App:
                     outputName = fm.encode(imagePath, text)
                 case "FiveModulusWithTwist":
                     outputName = fmt.encode(imagePath,text)
+                case "KPointsLSB":
+                    outputName = lsbK.encode(imagePath, text, 100) #k is hardcoded for now
                 case "PVD":
                     outputName = pvd.encode(imagePath,text)
             end = time.time()
@@ -288,6 +293,8 @@ class App:
                     result = fm.decode(imagePath) 
                 case "FiveModulusWithTwist":
                     result = fmt.decode(imagePath)
+                case "KPointsLSB":
+                    result = lsbK.decode(imagePath)
                 case "PVD":
                     result = pvd.decode(imagePath)
             self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
