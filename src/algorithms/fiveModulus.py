@@ -1,8 +1,10 @@
 import os
 import sys
-from PIL import Image
 from pathlib import Path
+
 import numpy as np
+from PIL import Image
+
 
 def squareEncoding(square, letter):
     """
