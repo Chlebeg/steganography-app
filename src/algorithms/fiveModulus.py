@@ -23,10 +23,12 @@ def squareEncoding(square, letter):
         sys.exit(1)
     reminder = (letter - 31) // 25 + 1
     position = (letter - 31) % 25
-    if square[position % 5][position // 5] + reminder > 255: 
-        square[position % 5][position // 5] += reminder - 5
+    result = int(square[position % 5][position // 5])
+    if result + reminder > 255: 
+        result += reminder - 5
     else:
-        square[position % 5][position // 5] += reminder
+        result += reminder
+    square[position%5][position//5] = result
     return square
 
 def squareDecoding(square):
@@ -121,6 +123,7 @@ def encode(imagePath, secretMessage):
     
         maxHeight = (height // 5) * 5
         maxWidth = (width // 5) * 5
+        print(maxHeight," ",maxWidth)
         
         i = 0
         for y in range(0, maxHeight, 5):

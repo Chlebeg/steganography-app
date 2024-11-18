@@ -24,10 +24,12 @@ def squaresEncoding(squares, letter):
     reminder = (letter - 31) // 25 + 1
     position = (letter - 31) % 25
     square = position//9
-    if squares[square][position % 3][(position - square*9) // 3] + reminder > 255: 
-        squares[square][position % 3][(position - square*9) // 3] += reminder - 5
+    result = int(squares[square][position % 3][(position - square*9) // 3])
+    if result + int(reminder) > 255: 
+         result += reminder - 5
     else:
-        squares[square][position % 3][(position - square*9)// 3] += reminder
+        result += reminder
+    squares[square][position % 3][(position - square*9)// 3] = result
     return squares
 
 def squaresDecoding(squares):
