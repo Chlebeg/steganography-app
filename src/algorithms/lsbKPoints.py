@@ -56,6 +56,7 @@ def decodeBitsFromPixels(pixels, length, startX, startY, width, height):
 def countCharacterLimit(imagePath):
     img = Image.open(imagePath)
     result = img.height * img.width
+    result = (3 * result) // 8
     return result
 
 def encode(imagePath, message, k):

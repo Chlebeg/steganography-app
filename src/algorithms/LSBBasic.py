@@ -39,7 +39,7 @@ def encodeIntoImage(img, pixels, bits):
 # TODO - fix this - function should take into account the message length coded at the begining of the message
 def countCharacterLimit(imagePath):
     img = Image.open(imagePath)
-    result = img.height * img.width
+    result = img.height * img.width - 4
     return result
 
 def encode(imagePath, message):

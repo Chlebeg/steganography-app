@@ -16,6 +16,7 @@ import algorithms.LSBBasic as lsbB
 import algorithms.LSBInEdges as lsbE
 import algorithms.LSBKPoints as lsbK
 import algorithms.PVD as pvd
+import algorithms.LSBWithGenerator as lsbG
 
 
 class App:
@@ -35,7 +36,7 @@ class App:
         self.imagePathLabels = {}
         self.encodingTime = {}
         self.characterLimit = {}
-        tabsName = ["BasicLSB", "EdgeLSB", "FiveModulus", "FiveModulusWithTwist", "KPointsLSB", "PVD", "Comparison"]
+        tabsName = ["BasicLSB", "EdgeLSB", "FiveModulus", "FiveModulusWithTwist", "KPointsLSB", "PVD","LSBWithGenerator" ,"Comparison"]
 
         for i in range(len(tabsName)):
             tab = ttk.Frame(self.notebook)
@@ -120,6 +121,8 @@ class App:
                 specialValue = lsbK.countCharacterLimit(imagePath)
             case "PVD":
                 specialValue = pvd.countCharacterLimit(imagePath)
+            case "LSBWithGenerator":
+                specialValue = lsbG.countCharacterLimit(imagePath)
         self.characterLimit[tabsName].config(text=f"Możliwa ilość znaków, które można zakodować: {specialValue}")
 
 
@@ -264,6 +267,8 @@ class App:
                     outputName = lsbK.encode(imagePath, text, 100) #k is hardcoded for now
                 case "PVD":
                     outputName = pvd.encode(imagePath,text)
+                case "LSBWithGenerator":
+                    outputName = lsbG.encode(imagePath,text)
             end = time.time()
             print(end-start)
             self.imagePaths[tabsName] = outputName
@@ -297,6 +302,8 @@ class App:
                     result = lsbK.decode(imagePath)
                 case "PVD":
                     result = pvd.decode(imagePath)
+                case "LSBWithGenerator":
+                    result = lsbG.decode(imagePath)
             self.showTextInWindow(f"Zakodowana wiadomośc to:\n{result}")
             print("Encoded message: ", result)
         except:
