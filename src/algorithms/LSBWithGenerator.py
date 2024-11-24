@@ -38,7 +38,7 @@ def encodeBitsInPixels(pixels, bits, width, height, begin=False):
             x,y = position,0
         else:
             position = next(positionGenerator)
-            x,y = position % width, 1 + position//width
+            x,y = position % width, 1 + position%(height-1)
         r, g, b = pixels[x, y]
 
         # Encode one bit in each channel
@@ -65,7 +65,7 @@ def decodeBitsFromPixels(pixels, length, width, height, begin=False):
             x,y = position,0
         else:
             position = next(positionGenerator)
-            x,y = position % width, 1 + position//width
+            x,y = position % width, 1 + position%(height-1)
         if bitIdx >= length:
             return bits
 
@@ -77,7 +77,7 @@ def decodeBitsFromPixels(pixels, length, width, height, begin=False):
         bitIdx += 3
 
 def countCharacterLimit(imagePath=""):
-    return P-1
+    return (P-1) * 3 // 8 
 
 def encode(imagePath, message):
     img = Image.open(imagePath)

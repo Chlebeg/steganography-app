@@ -7,7 +7,7 @@ from tkinter import filedialog, ttk
 import cv2
 import numpy as np
 import webview
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageChops
 from tkinterhtml import HtmlFrame
 
 import algorithms.fiveModulus as fm
@@ -36,7 +36,7 @@ class App:
         self.imagePathLabels = {}
         self.encodingTime = {}
         self.characterLimit = {}
-        tabsName = ["BasicLSB", "EdgeLSB", "FiveModulus", "FiveModulusWithTwist", "KPointsLSB", "PVD","LSBWithGenerator" ,"Comparison"]
+        tabsName = ["BasicLSB", "EdgeLSB", "FiveModulus", "FiveModulusWithTwist", "KPointsLSB", "PVD","LSBWithGenerator" ,"Comparison","HeatMap"]
 
         for i in range(len(tabsName)):
             tab = ttk.Frame(self.notebook)
@@ -44,6 +44,8 @@ class App:
             self.tabs.append(tab)
             if tabsName[i] == "Comparison":
                 self.createComparisonTab(tab)
+            elif tabsName[i] == "HeatMap":
+                self.createHeatMapTab(tab)
             else:
                 self.createStegoTab(tab, tabsName[i])
 
@@ -149,6 +151,34 @@ class App:
         webview.start()
 
 
+    def createHeatMapTab(self, tab):
+        tab.rowconfigure(1, weight=1)
+        tab.columnconfigure(0, weight=1)
+
+        imageFrame = tk.Frame(tab)
+        imageFrame.grid(row=0, column=0, pady=10, sticky="nsew")
+        imageFrame.columnconfigure(0, weight=1)
+        imageFrame.columnconfigure(1, weight=1)
+
+        self.originalImagePath = ""
+        self.encodedImagePath = ""
+        selectOriginalButton = tk.Button(imageFrame, text="Wybierz oryginalny obraz", command=self.selectOriginalImage)
+        selectEncodedButton = tk.Button(imageFrame, text="Wybierz zakodowany obraz", command=self.selectEncodedImage)
+        
+        selectOriginalButton.grid(row=0, column=0, padx=10, pady=5)
+        selectEncodedButton.grid(row=0, column=1, padx=10, pady=5)
+        
+        self.originalImageLabel = tk.Label(imageFrame, text="Oryginalny obraz")
+        self.encodedImageLabel = tk.Label(imageFrame, text="Zakodowany obraz")
+
+        self.originalImageLabel.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        self.encodedImageLabel.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
+
+        statsFrame = tk.Frame(tab)
+        statsFrame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+        
+        calculateStatsButton = tk.Button(tab, text="Pokaż heatmape", command=self.highlightDifferences)
+        calculateStatsButton.grid(row=3, column=0, pady=10)
     def createComparisonTab(self, tab):
         """
         createComparisonTab - function to create Comparision tab
@@ -206,6 +236,31 @@ class App:
         label.config(image=photo, text="")
         label.image = photo
 
+    def highlightDifferences(self):
+        img1 = Image.open(self.originalImagePath).convert("RGB")
+        img2 = Image.open(self.encodedImagePath).convert("RGB")
+        
+        # Upewnij się, że obrazy mają ten sam rozmiar
+        if img1.size != img2.size:
+            self.showTextInWindow("Obrazy muszą mieć ten sam rozmiar")
+            raise ValueError("Obrazy muszą mieć ten sam rozmiar")
+        
+        diff = ImageChops.difference(img1, img2)
+        
+        # Twórz obraz wynikowy, bazujący na pierwszym obrazie
+        result = img1.copy()
+        pixels = result.load()
+        diffPixels = diff.load()
+        
+        # Iteruj przez piksele i zaznacz różnice na czerwono
+        for y in range(result.height):
+            for x in range(result.width):
+                # Jeżeli różnica w jakimkolwiek kanale RGB jest większa od zera
+                if diffPixels[x, y] != (0, 0, 0):  
+                    pixels[x, y] = (255, 0, 0)  # Zaznacz piksel na czerwono
+        
+        # Wyświetl wynik
+        result.show()
     def calculateStats(self):
         """
         calculateStats - calculates MSE and PSNR metrics between original and stegano images
