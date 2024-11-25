@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steganografia - Algorytm Five Modulus Method</title>
+    <title>Algorytm Five Modulus Method</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,19 +42,61 @@
 </head>
 <body>
     <div class="container">
-        <h1>Steganografia - Five Modulus Method</h1>
-        <p>Five Modulus Method (FMM) to algorytm, który umożliwia ukrywanie tekstu w obrazach. Metoda ta operuje na blokach pikseli o rozmiarze 5x5, modyfikując ich wartości w taki sposób, aby były podzielne przez 5. Po czym ukrywa zmienia jednen element w bloku na liczbę niepodzielną przez 5. Dzięki temu możliwe jest zakodowanie wiadomości bez znaczącego pogorszenia jakości obrazu.</p>
         
-        <h2>Jak działa algorytm?</h2>
-        <p>Algorytm dzieli obraz na bloki pikseli 5x5. Każdy piksel jest przekształcany tak, aby jego wartość była wielokrotnością liczby 5, co nie wpływa na jakość obrazu widzianego przez ludzkie oko. Następnie algorytm wykorzystuje pozostałe reszty z dzielenia przez 5 (1, 2, 3 lub 4) do oznaczania znaków zakodowanego tekstu. Określone wartości pikseli w bloku reprezentują odpowiednie znaki w tajnej wiadomości.</p>
+        <h1>Five Modulus Method</h1>
+        <p>Five Modulus Method (FMM) to algorytm, który umożliwia ukrywanie tekstu w obrazach. Dzięki niemu możliwe jest zakodowanie wiadomości bez znaczącego pogorszenia jakości obrazu.<a href="https://arxiv.org/pdf/1307.0642">Źródło algorytmu</a></p>
         
+                <h2>Jak działa algorytm?</h2>
+        <p>Algorytm działa w następujący sposób:</p>
+        <ol>
+        <li><strong>Podział obrazu na bloki 5x5:</strong>  
+            Obraz jest dzielony na bloki o wymiarach 5x5 pikseli.
+        </li>
+        <li><strong>Przekształcanie pikseli:</strong>  
+            Każdy piksel jest modyfikowany tak, aby jego wartość była wielokrotnością liczby 5. Te zmiany są subtelne i nie wpływają na jakość obrazu widoczną dla ludzkiego oka.
+        </li>
+        <li><strong>Wybór pozycji w bloku:</strong>  
+            Algorytm wybiera jedną pozycję w bloku 5x5, gdzie wartość piksela zostaje zmieniona na liczbę niepodzielną przez 5.
+            Istnieje 25 możliwych pozycji, ponieważ blok zawiera 25 pikseli.
+        </li>
+        <li><strong>Kodowanie informacji:</strong>  
+            Reszty z dzielenia przez 5 (1, 2, 3 lub 4) są wykorzystywane do oznaczenia znaków tajnej wiadomości. Każda z tych reszt reprezentuje konkretny znak w zakodowanym tekście.
+        </li>
+        <li><strong>Reprezentacja danych:</strong>  
+            Określone wartości pikseli w bloku odpowiadają odpowiednim znakom w ukrytej wiadomości.
+        </li>
+        </ol>
+
+        <p>W ten sposób algorytm umożliwia ukrywanie informacji w obrazie, nie zmieniając jego widocznej jakości.</p>
+
         <div class="example">
             <h3>Przykład</h3>
-            <p>Wyobraźmy sobie, że chcemy ukryć literę "A" w bloku pikseli 5x5. ASCII dla "A" to 65, co odpowiada wartości, którą można zakodować jako pozostałość 1 przy dzieleniu przez 5. Algorytm modyfikuje odpowiednie piksele, aby uzyskać tę pozostałość, dzięki czemu możliwe jest odkodowanie wiadomości przez odbiorcę.</p>
+            <p>Załóżmy, że chcemy ukryć literę "A" w bloku pikseli 5x5. Wartość ASCII dla litery "A" to 65. Aby rozpocząć kodowanie, musimy odjąć 31, ponieważ pierwszy znak, który będziemy kodować to spacja, której wartość ASCII to 32. Obliczenia wyglądają następująco:</p>
+            <ul>
+                <li>65 - 31 = 34</li>
+                <li>34 // 25 + 1 = 2 (reszta)</li>
+                <li>34 % 25 = 9 (pozycja)</li>
+            </ul>
+            <p>Reszta (9) wskazuje, na którą pozycję w bloku pikseli dodamy wartość 2. Zatem dodajemy 2 do wartości piksela na pozycji 9 w bloku 5x5.</p>
+
         </div>
 
         <h2>Zalety metody</h2>
-        <p>Five Modulus Method zapewnia wysoki poziom bezpieczeństwa przy niewielkim wpływie na jakość obrazu. Obraz ze zakodowaną wiadomością jest wizualnie niemal identyczny z oryginałem, a wartości PSNR (stosunek sygnału do szumu) wskazują na wysoką jakość ukrytego obrazu.</p>
+        <ul>
+            <li>Wysoka wydajność ukrywania danych.
+                Algorytm umożliwia ukrywanie danych z wykorzystaniem tylko jednej operacji modulo dla każdego piksela, co czyni go wydajnym pod względem obliczeniowym.</li>
+            <li> Zmiana wartości pikseli jest ograniczona do maksymalnie ±2, co sprawia, że różnice w obrazie są mało widoczne dla ludzkiego oka.</li>
+            <li> Prostota implementacji.
+                Algorytm nie wymaga skomplikowanych operacji matematycznych ani złożonych struktur danych, co upraszcza implementację w oprogramowaniu.</li>
+          </ul> 
+        <p> </p>
+        <h2>Wady metody</h2>
+        <ul>
+            <li>Trzeba zmienić wartość prawie każdego piksela</li>
+            <li>Ograniczona pojemność danych.
+                FMM może ukrywać stosunkowo małą ilość danych, ponieważ zmiany w pikselach są subtelne, co ogranicza liczbę bitów możliwych do zakodowania w jednym pikselu. Ponadto żeby zakodować jeden znak potrzebujemy 25 pixeli.</li>
+            <li>Algorytm pracuje jedynie na jednej warstwie RGB. Nie wykorzystuje dużej ilości pixeli do zakodowania.</li>
+        </ul>
     </div>
 </body>
 </html>
