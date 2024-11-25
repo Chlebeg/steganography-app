@@ -45,15 +45,68 @@
         <h1>Five Modulus With Twist Method</h1>
         <p>Five Modulus Method With Twist (FMMWT) to algorytm, który zainspirowany jest tym <a href="https://arxiv.org/pdf/1307.0642">algorytmem.</a></p>
         
-        <h2>Jak działa algorytm?</h2>
-        <p>Algorytm dzieli obraz na bloki pikseli 3x3. Każdy piksel jest przekształcany tak, aby jego wartość była wielokrotnością liczby 5, co nie wpływa na jakość obrazu widzianego przez ludzkie oko. Następnie algorytm wybiera jedną pozycje w bloku 3x3 na jednej z trzech warstw i zmienia liczbę na tej pozycji na niepodzielną przez 5. Pozycja bloku może być wybraną na 9*3 sposobów, ponieważ algorytm pracuje na trzech warstwach RGB. Następnie po wybraniu miejsca, wykorzystuje pozostałe reszty z dzielenia przez 5 (1, 2, 3 lub 4) do oznaczania znaków zakodowanego tekstu. Określone wartości pikseli w bloku reprezentują odpowiednie znaki w tajnej wiadomości.</p>
+        <h2>Jak działa algorytm FMMWT?</h2>
+<ol>
+  <li>
+    <strong>Podział obrazu na bloki 3x3:</strong> 
+    Obraz zostaje podzielony na mniejsze bloki o wymiarach 3x3 pikseli.
+  </li>
+  <li>
+    <strong>Przekształcenie wartości pikseli:</strong>
+    Każda wartość piksela w bloku jest modyfikowana tak, aby była wielokrotnością liczby 5. 
+    Te zmiany są na tyle subtelne, że nie wpływają na jakość obrazu widoczną dla ludzkiego oka.
+  </li>
+  <li>
+    <strong>Kodowanie danych w jednym pikselu:</strong> 
+    W każdym bloku algorytm wybiera jeden piksel spośród 9 dostępnych. 
+    Wybór odbywa się na jednej z trzech warstw koloru (R, G lub B), co daje 27 możliwych pozycji 
+    (9 pikseli × 3 warstwy).
+  </li>
+  <li>
+    <strong>Reprezentacja danych:</strong>
+    Wybrany piksel w bloku zostaje zmodyfikowany tak, aby jego wartość 
+    <em>nie była wielokrotnością liczby 5</em>. 
+    Reszty z dzielenia przez 5 (1, 2, 3 lub 4) są używane do zakodowania konkretnych znaków 
+    tajnej wiadomości.
+  </li>
+  <li>
+    <strong>Dekodowanie danych:</strong>
+    Podczas odczytu algorytm analizuje wartości pikseli w blokach 3x3, identyfikuje te, które 
+    nie są wielokrotnościami liczby 5, i na tej podstawie odtwarza zakodowaną wiadomość.
+  </li>
+</ol>
+<p>W skrócie, algorytm ukrywa dane w subtelnych modyfikacjach wybranych pikseli, co czyni 
+zakodowaną wiadomość trudną do wykrycia, zachowując jednocześnie wysoką jakość obrazu.</p>
+
         
         <div class="example">
-            <h3>Przykład</h3>
-            <p>Wyobraźmy sobie, że chcemy ukryć literę "A" w bloku pikseli 3x3. ASCII dla 
-                "A" to 65. Najpierw trzeba odjąc od 65, 31, bo pierwszy znak jaki kodujemy to spacja (32 w ASCII). 65-31 = 34.
-                34//25 + 1= 2 (+1 żeby reminder nie był 0), Pozycja to 34 % 25 = 9. 9//9 = 1, więc kodujemy w drugiej warstwie. 9 % 3 = 0, 9 - 9 * 1 = 0, więc zmieniamu piksel w kwadracie 3x3 w miejscu 9 [0,0]
-            </p>
+            <h3>Przykład: Ukrywanie litery "A" w bloku pikseli 3x3</h3>
+<p>Załóżmy, że chcemy ukryć literę "A" w bloku pikseli 3x3. Kod ASCII dla litery "A" to 65. Aby rozpocząć kodowanie, wykonujemy następujące kroki:</p>
+
+<ul>
+  <li><strong>Krok 1:</strong> Zaczynamy od wartości ASCII dla litery "A" (65). Od tej liczby odejmujemy 31, ponieważ pierwszym zakodowanym znakiem jest spacja (32 w ASCII).  
+      <code>65 - 31 = 34</code>
+  </li>
+  
+  <li><strong>Krok 2:</strong> Następnie dzielimy 34 przez 25 (choćby tylko w celu obliczenia reszty, która będziemy dodawać do liczby):  
+      <code>34 // 25 + 1 = 2</code> (dodajemy 1, aby reminder nie wynosił 0).
+  </li>
+
+  <li><strong>Krok 3:</strong> Pozycja w bloku to wynik operacji modulo:  
+      <code>34 % 25 = 9</code>
+  </li>
+
+  <li><strong>Krok 4:</strong> Aby określić, w której warstwie (R, G lub B) będzie kodowana litera, dzielimy 9 przez 9 (liczba pikseli w warstwie):  
+      <code>9 // 9 = 1</code>, co oznacza, że kodujemy w drugiej warstwie (druga warstwa, G).
+  </li>
+
+  <li><strong>Krok 5:</strong> Ostatecznie, aby określić dokładną pozycję w obrębie warstwy, wykonujemy operację modulo:  
+      <code>9 % 3 = 0</code>, co oznacza, że zmieniamy piksel na pozycji [0, 0] w bloku 3x3.
+  </li>
+</ul>
+
+<p>W wyniku tych obliczeń, litera "A" zostaje zakodowana w pikselu o pozycji [0, 0] w drugiej warstwie RGB w bloku 3x3.</p>
+
         </div>
 
         <h2>Zalety metody</h2>
