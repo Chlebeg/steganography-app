@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorytm Five Modulus Method</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+        .example {
+            background-color: #e7f3fe;
+            border-left: 5px solid #2196F3;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .example p {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Five Modulus With Twist Method</h1>
+        <p>Five Modulus Method With Twist (FMMWT) to algorytm, który zainspirowany jest tym <a href="https://arxiv.org/pdf/1307.0642">algorytmem.</a></p>
+        
+        <h2>Jak działa algorytm?</h2>
+        <p>Algorytm dzieli obraz na bloki pikseli 3x3. Każdy piksel jest przekształcany tak, aby jego wartość była wielokrotnością liczby 5, co nie wpływa na jakość obrazu widzianego przez ludzkie oko. Następnie algorytm wybiera jedną pozycje w bloku 3x3 na jednej z trzech warstw i zmienia liczbę na tej pozycji na niepodzielną przez 5. Pozycja bloku może być wybraną na 9*3 sposobów, ponieważ algorytm pracuje na trzech warstwach RGB. Następnie po wybraniu miejsca, wykorzystuje pozostałe reszty z dzielenia przez 5 (1, 2, 3 lub 4) do oznaczania znaków zakodowanego tekstu. Określone wartości pikseli w bloku reprezentują odpowiednie znaki w tajnej wiadomości.</p>
+        
+        <div class="example">
+            <h3>Przykład</h3>
+            <p>Wyobraźmy sobie, że chcemy ukryć literę "A" w bloku pikseli 3x3. ASCII dla 
+                "A" to 65. Najpierw trzeba odjąc od 65, 31, bo pierwszy znak jaki kodujemy to spacja (32 w ASCII). 65-31 = 34.
+                34//25 + 1= 2 (+1 żeby reminder nie był 0), Pozycja to 34 % 25 = 9. 9//9 = 1, więc kodujemy w drugiej warstwie. 9 % 3 = 0, 9 - 9 * 1 = 0, więc zmieniamu piksel w kwadracie 3x3 w miejscu 9 [0,0]
+            </p>
+        </div>
+
+        <h2>Zalety metody</h2>
+        <ul>
+            <li>Wysoka wydajność ukrywania danych.
+                Algorytm umożliwia ukrywanie danych z wykorzystaniem tylko jednej operacji modulo dla każdego piksela, co czyni go wydajnym pod względem obliczeniowym.</li>
+            <li> Zmiana wartości pikseli jest ograniczona do maksymalnie ±2, co sprawia, że różnice w obrazie są mało widoczne dla ludzkiego oka.</li>
+            <li> Prostota implementacji.
+                Algorytm nie wymaga skomplikowanych operacji matematycznych ani złożonych struktur danych, co upraszcza implementację w oprogramowaniu.</li>
+            <li>Algorytm wykorzystuje 3 warstwy, dzięki czemu można zakodować więcej informacji</li>
+          </ul> 
+        <p> </p>
+        <h2>Wady metody</h2>
+        <ul>
+            <li>Trzeba zmienić wartość prawie każdego piksela</li>
+            <li>Ograniczona pojemność danych.
+                FMM może ukrywać stosunkowo małą ilość danych, ponieważ zmiany w pikselach są subtelne, co ogranicza liczbę bitów możliwych do zakodowania w jednym pikselu. Ponadto żeby zakodować jeden znak potrzebujemy 9 pixeli.</li>
+        </ul>
+    </div>
+</body>
+</html>
