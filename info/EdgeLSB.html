@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorytm Edge LSB</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+        li {
+            line-height: 1.6;
+            color: #333;
+        }
+        .example {
+            background-color: #e7f3fe;
+            border-left: 5px solid #2196F3;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .example p {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edge LSB</h1>
+        <p>Algorytm ukrywa informacje w czarno-białych obrazach, wykorzystując piksele znajdujące się na krawędziach wykrytych za pomocą funkcji <code>Canny()</code>. 
+            Wiadomość jest kodowana w dwóch najmniej znaczących bitach intensywności pikseli na tych krawędziach.</p>
+        
+        <h2>Jak działa algorytm?</h2>
+        <p>Proces kodowania przebiega w następujących krokach:</p>
+        
+        <ol>
+            <li>W obrazie w odcieniach szarości wykrywane są krawędzie za pomocą funkcji <code>Canny()</code> z biblioteki OpenCV.</li>
+            <li>Wiadomość tekstowa jest przekształcana na reprezentację binarną i uzupełniana sekwencją końcową <code>1000000000000001</code>.</li>
+            <li>Piksele krawędziowe są losowo permutowane z użyciem klucza, co podnosi poziom bezpieczeństwa.</li>
+            <li>W dwóch najmniej znaczących bitach każdego pikselu krawędziowego zapisywane są kolejne 2 bity wiadomości.</li>
+        </ol>
+
+        <h2>Dekodowanie</h2>
+        <p>Proces odczytywania wiadomości:</p>
+        <ol>
+            <li>W obrazie ponownie wykrywane są krawędzie, aby zidentyfikować piksele krawędziowe.</li>
+            <li>Odtwarzana jest permutacja pikseli krawędziowych przy użyciu tego samego klucza.</li>
+            <li>Z najmniej znaczących bitów każdego pikselu odczytywane są kolejne 2 bity wiadomości, tworząc ciąg binarny.</li>
+            <li>Proces kończy się po wykryciu sekwencji końcowej <code>1000000000000001</code>.</li>
+            <li>Ciąg binarny jest konwertowany na tekst ASCII, odtwarzając oryginalną wiadomość.</li>
+        </ol>
+
+
+        <div class="example">
+            <h3>Przykład</h3>
+            <p>Dla wiadomości "SECRET" binarna reprezentacja to: <code>0101001101000101010011000101001001000101</code>. 
+            Po dodaniu sekwencji końcowej <code>1000000000000001</code>, bity są zapisywane w pikselach krawędziowych, 
+            przy losowym rozmieszczeniu kontrolowanym przez algorytm.</p>
+        </div>
+
+        <h2>Zalety metody</h2>
+        <ul>
+            <li><strong>Lepsza niewidzialność:</strong> Ukrywanie danych w krawędziach ogranicza widoczność zmian w obrazie.</li>
+        </ul>
+
+        <h2>Wady metody</h2>
+        <ul>
+            <li><strong>Ograniczona pojemność:</strong> Możliwość ukrycia wiadomości jest ograniczona przez liczbę pikseli krawędziowych, szczególnie w obrazach o niskim kontraście.</li>
+            <li><strong>Wrażliwość na obróbkę obrazu:</strong> Operacje takie jak wygładzanie czy kompresja stratna mogą usunąć zakodowane dane.</li>
+        </ul>
+    </div>
+</body>
+</html>

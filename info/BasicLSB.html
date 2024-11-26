@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorytm Basic LSB</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+        li {
+            line-height: 1.6;
+            color: #333;
+        }
+        .example {
+            background-color: #e7f3fe;
+            border-left: 5px solid #2196F3;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .example p {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Basic LSB</h1>
+        <p>Algorytm LSB (Least Significant Bit) ukrywa informacje w obrazie poprzez modyfikację najmniej znaczących bitów pikseli. 
+            W tej wersji implementacji 2 bity wiadomości są ukrywane w kanałach czerwonym (R) i zielonym (G), a 4 bity w kanale niebieskim (B)</p>
+        
+        <h2>Jak działa algorytm?</h2>
+        <p>Algorytm działa w następujący sposób:</p>
+        
+        <ol>
+            <li>Wiadomość jest zamieniana na binarną reprezentację.</li>
+            <li>Pierwsze 32 bity obrazu są zarezerwowane na zapisanie długości wiadomości (także w postaci binarnej).</li>
+            <li>Algorytm iteruje po pikselach obrazu i modyfikuje:<ul>
+                <li>2 najmniej znaczące bity w kanale czerwonym (R),</li>
+                <li>2 najmniej znaczące bity w kanale zielonym (G),</li>
+                <li>4 najmniej znaczące bity w kanale niebieskim (B).</li>
+            </ul></li>
+            <li>Proces jest kontynuowany aż do zakodowania wszystkich bitów wiadomości.</li>
+        </ol>
+
+        <p> Dekodowanie wiadomości odbywa się analogicznie poprzez oczytanie długości zakodowanej wiadomości, a następnie poprzez przejście kolejne przez 
+            wszystkie pixele</p>
+
+        <div class="example">
+            <h3>Przykład</h3>
+            <p>
+                Wiadomość "HELLO" jest zamieniana na binarną reprezentację: <code>0100100001000101010011000100110001001111</code>. Długość wiadomości 
+                (40 bitów) jest zapisana w pierwszych 32 bitach obrazu. Kolejne bity wiadomości są zapisane w pikselach:
+                <ul>
+                    <li><strong>Kanał R:</strong> 2 bity <code>(01)</code></li>
+                    <li><strong>Kanał G:</strong> 2 bity <code>(00)</code></li>
+                    <li><strong>Kanał B:</strong> 4 bity <code>(1000)</code></li>
+                </ul>
+                Następnie przechodzimy do kolejnego piksela i ponawiamy proces zapisu wiadomości
+            </p>
+        </div>
+
+        <h2>Zalety metody</h2>
+        <p>
+            <li><strong>Prostota implementacji:</strong> Algorytm jest łatwy do zrozumienia i wdrożenia.</li>
+            <li><strong>Niski wpływ na jakość obrazu:</strong> Modyfikacje w najmniej znaczących bitach są praktycznie niezauważalne dla ludzkiego oka.</li>
+            <li><strong>Zwiększona pojemność:</strong> Wykorzystanie 4 bitów w kanale niebieskim pozwala ukryć więcej danych niż klasyczny LSB.</li>
+            <li><strong>Efektywność:</strong> Kodowanie i dekodowanie odbywają się w czasie liniowym względem rozmiaru obrazu.</li>
+        </p>
+        <h2>Wady metody</h2>
+        <p>
+            <li><strong>Podatność na zmiany:</strong> Obróbka obrazu (np. kompresja, zmiana rozdzielczości) może uszkodzić zakodowaną wiadomość.</li>
+            <li><strong>Podatność na analizę</strong> Przy zestawieniu obrazu orginalnego z obrazem posiadającym zakodowaną wiadomość za pomocą np.heatmapy 
+                łatwo się domyślić jaki algorytm steganograficzny został wykorzystany</li>
+        </p>
+    </div>
+</body>
+</html>
+
