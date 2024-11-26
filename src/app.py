@@ -18,6 +18,18 @@ import algorithms.LSBKPoints as lsbK
 import algorithms.PVD as pvd
 import algorithms.LSBWithGenerator as lsbG
 
+def findProjectRoot(start_path=None, marker_files=(".gitignore", "requirements.txt")):
+    if start_path is None:
+        start_path = os.getcwd()
+
+    current_path = os.path.abspath(start_path)
+
+    while current_path != os.path.dirname(current_path):
+        if any(os.path.exists(os.path.join(current_path, marker)) for marker in marker_files):
+            return current_path
+        current_path = os.path.dirname(current_path)
+
+    return None
 
 class App:
     def __init__(self, root):
@@ -126,28 +138,20 @@ class App:
             case "LSBWithGenerator":
                 specialValue = lsbG.countCharacterLimit(imagePath)
         self.characterLimit[tabsName].config(text=f"Możliwa ilość znaków, które można zakodować: {specialValue}")
-
-
-
+    
     def showInfo(self, tabsName):
         """
         showInfo - function to show window containing info about algorithm from an HTML file
         using pywebview to render HTML content in a separate window.
         """
-        print("TEST")
-        # Ustal ścieżkę do pliku HTML na podstawie tabsName
-        htmlFilePath = f"info/{tabsName}.html"
-        htmlFilePath = os.path.abspath(htmlFilePath)
+        project_root = findProjectRoot()
+        htmlFilePath = os.path.join(project_root ,"info", f"{tabsName}.html")
 
-        # Sprawdź, czy plik istnieje
         if not os.path.isfile(htmlFilePath):
             self.showTextInWindow("Plik HTML nie znaleziony. Upewnij się, że plik istnieje.")
             return
 
-        # Wywołanie pywebview bezpośrednio bez wątkowania
         webview.create_window("Informacje", htmlFilePath)
-
-        # Zamiast uruchamiać pywebview w innym wątku, uruchommy go w głównym wątku
         webview.start()
 
 
