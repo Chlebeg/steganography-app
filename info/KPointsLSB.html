@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorytm K-points LSB</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+        li {
+            line-height: 1.6;
+            color: #333;
+        }
+        .example {
+            background-color: #e7f3fe;
+            border-left: 5px solid #2196F3;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .example p {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>K-points LSB</h1>
+        <p>Algorytm K-points LSB ukrywa informacje w obrazie poprzez modyfikację najmniej znaczących bitów pikseli (tu się nie różni zbytnio od czystego LSB).
+            Jego kluczową cechą jest losowanie <code>k</code> punktów startowych i wybór tego, który wprowadza najmniejsze zmiany w obrazie podczas kodowania wiadomości. <a href="https://ieeexplore-1ieee-1org-10000478f0141.wbg2.bg.agh.edu.pl/document/10598763">Źródło algorytmu</a></p>
+        
+        <h2>Jak działa algorytm?</h2>
+        <h3>Kodowanie</h3>
+        <p>Proces kodowania przebiega w następujących etapach:</p>
+        
+        <ol>
+            <li>Wiadomość jest przekształcana na reprezentację binarną (8 bitów na znak).</li>
+            <li>Losowanych jest <code>k</code> punktów startowych w obrazie.</li>
+            <li>Dla każdego punktu testowana jest liczba zmian pikseli potrzebnych do zakodowania wiadomości.</li>
+            <li>Wybierany jest punkt startowy minimalizujący zmiany w obrazie.</li>
+            <li>Metadane (punkt startowy i długość wiadomości) są zapisywane w pierwszych pikselach obrazu.</li>
+            <li>Wiadomość jest kodowana od wybranego punktu, zapisując kolejne bity w kanałach RGB pikseli.</li>
+        </ol>
+
+        <h3>Dekodowanie</h3>
+        <p>Proces odczytu ukrytej wiadomości:</p>
+        <ol>
+            <li>Odczytywane są metadane zakodowane w pierwszych pikselach: współrzędne punktu startowego i długość wiadomości.</li>
+            <li>Algorytm odczytuje wiadomość, zaczynając od punktu startowego, odczytując najmniej znaczące bity kanałów RGB pikseli.</li>
+            <li>Binarna reprezentacja wiadomości jest konwertowana na znaki ASCII, przywracając oryginalną treść.</li>
+        </ol>
+
+        <div class="example">
+            <h3>Przykład</h3>
+            <p>Dla wiadomości "HELLO" binarna reprezentacja to: <code>0100100001000101010011000100110001001111</code>. 
+            Algorytm losuje 100 punktów startowych i wybiera ten, który minimalizuje zmiany w obrazie podczas kodowania wiadomości.</p>
+            <p>Metadane, takie jak współrzędne punktu startowego i długość wiadomości, są zapisane w pierwszych pikselach obrazu, co umożliwia dekodowanie.</p>
+        </div>
+
+        <h2>Zalety metody</h2>
+        <ul>
+            <li><strong>Zminimalizowane zmiany:</strong> Algorytm optymalizuje liczbę modyfikacji w obrazie, utrzymując jego wysoką jakość wizualną po kodowaniu.</li>
+            <li><strong>Wysoka pojemność:</strong> Możliwość kodowania wiadomości w dowolnym obszarze obrazu zwiększa potencjalne miejsce na dane.</li>
+        </ul>
+
+        <h2>Wady metody</h2>
+        <ul>
+            <li><strong>Złożoność obliczeniowa:</strong> Analiza <code>k</code> punktów startowych wydłuża czas kodowania.</li>
+            <li><strong>Podatność na analizę</strong> Tak samo jak przy Basic LSB, zestawienie obrazu orginalnego z obrazem posiadającym zakodowaną wiadomość i pokazanie heatmapy zmian jasno ujawnia że wiadomość została zakodowana</li>
+        </ul>
+    </div>
+</body>
+
+</html>

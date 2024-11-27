@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorytm PVD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+        li {
+            line-height: 1.6;
+            color: #333;
+        }
+        .example {
+            background-color: #e7f3fe;
+            border-left: 5px solid #2196F3;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .example p {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Algorytm PVD (Pixel Value Differencing)</h1>
+        <p>Pixel Value Differencing (PVD) to metoda steganograficzna wykorzystująca różnice wartości sąsiadujących pikseli w obrazie do ukrywania danych.
+             Im większa różnica między pikselami, tym więcej informacji można w nich zakodować, co umożliwia dynamiczne zarządzanie pojemnością. <a href="https://ieeexplore-1ieee-1org-1000047op0094.wbg2.bg.agh.edu.pl/document/5209914">Źródło algorytmu</a></p>
+        
+        <h2>Jak działa algorytm?</h2>
+        <h3>Kodowanie:</h3>
+        <p>Proces kodowania przebiega według następujących kroków:</p>
+        
+        <ol>
+            <li>Analizowane są piksele obrazu (z wyjątkiem tych w pierwszym wierszu i kolumnie) oraz ich sąsiedzi (lewy, górny i górno-lewy).</li>
+            <li>Obliczana jest różnica między maksymalną i minimalną wartością jasności wśród sąsiednich pikseli.</li>
+            <li>Na podstawie tej różnicy określana jest liczba bitów (<code>n</code>), które można zakodować w danym pikselu:
+                <ul>
+                    <li>Różnica < 1: 1 bit</li>
+                    <li>Różnica < 5: 2 bity</li>
+                    <li>Różnica < 9: 3 bity</li>
+                    <li>Różnica ≥ 9: 4 bity</li>
+                </ul>
+            </li>
+            <li>Zakodowanie danych polega na zastąpieniu <code>n</code> najmniej znaczących bitów pikselu bitami wiadomości.</li>
+            <li>Proces trwa aż do zakodowania całej wiadomości. Na końcu dodawany jest znacznik końca wiadomości (<code>00000000</code>).</li>
+        </ol>
+
+        <h3>Dekodowanie</h3>
+        <p>Odczytywanie wiadomości odbywa się w następujący sposób:</p>
+        <ol>
+            <li>Algorytm analizuje piksele obrazu i ich sąsiadów w sposób zgodny z procesem kodowania.</li>
+            <li>Obliczana jest różnica pomiędzy wartościami sąsiednich pikseli, co pozwala określić liczbę bitów (<code>n</code>), które zostały zakodowane w pikselu.</li>
+            <li>Najmniej znaczące bity pikselu są odczytywane i dołączane do odtwarzanej wiadomości.</li>
+            <li>Proces kończy się po znalezieniu znacznika końca wiadomości (<code>00000000</code>).</li>
+        </ol>
+
+        <div class="example">
+            <h3>Przykład</h3>
+            <p>Przykładowo, jeśli piksel ma wartość 150, a sąsiadujące piksele mają wartości: 145, 160 i 148, to maksymalna różnica wynosi 15, co pozwala zakodować 4 bity wiadomości.</p>
+            <p>Dla wiadomości <code>1101</code>, piksel zostaje zmodyfikowany tak, aby jego 4 najmniej znaczące bity przyjęły wartość <code>1101</code>, zmieniając wartość pikselu na 157.</p>
+        </div>
+
+        <h2>Zalety metody</h2>
+        <ul>
+            <li><strong>Dynamiczna pojemność:</strong> Liczba zakodowanych bitów w pikselach zależy od różnic między ich wartościami, co pozwala optymalnie wykorzystać przestrzeń.</li>
+            <li><strong>Lepsza jakość obrazu:</strong> Dzięki elastycznemu dostosowywaniu liczby bitów zmiany w obrazie są trudniejsze do wykrycia.</li>
+            <li><strong>Efektywność:</strong> Możliwość kodowania większych wiadomości w obszarach z wyraźnymi różnicami jasności.</li>
+        </ul>
+
+        <h2>Wady metody</h2>
+        <ul>
+            <li><strong>Wrażliwość na modyfikacje obrazu:</strong> Operacje takie jak kompresja stratna czy filtrowanie mogą uszkodzić zakodowane dane.</li>
+            <li><strong>Zależność od struktury obrazu:</strong> W obrazach o małym kontraście (niewielkie różnice pikseli) metoda ma ograniczoną pojemność.</li>
+            <li><strong>Złożoność:</strong> Algorytm wymaga dodatkowych obliczeń związanych z analizą różnic pikseli i dopasowywaniem liczby zakodowanych bitów.</li>
+        </ul>
+    </div>
+</body>
+
+</html>
