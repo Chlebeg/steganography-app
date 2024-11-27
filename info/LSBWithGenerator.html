@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSBWithGenerator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+        }
+        .example {
+            background-color: #e7f3fe;
+            border-left: 5px solid #2196F3;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        .example p {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LSB With Generator</h1>
+        <p>Algorytm służy do ukrywania wiadomości w obrazach metodą steganograficzną, wykorzystującą technikę LSB (Least Significant Bit) oraz generator pozycji.</p>
+        
+        <h2>Jak działa algorytm?</h2>
+        <p>Algorytm ukrywa wiadomość w pikselach obrazu poprzez modyfikację najmniej znaczącego bitu (LSB) w każdym kanale koloru (R, G, B). Do wyznaczania pozycji pikseli, w których zapisywane są dane, wykorzystuje generator pozycji oparty na wzorze matematycznym g^x mod p. Wykorzystywana jest liczba pierwsza <code>P</code> i  generator <code>G</code>. Proces działa w dwóch etapach:</p>
+        <ul>
+            <li>Zakodowanie metadanych, takich jak długość wiadomości, w pierwszych pikselach obrazu.</li>
+            <li>Zakodowanie właściwej wiadomości w kolejnych pikselach wyznaczonych przez generator pozycji.</li>
+        </ul>
+
+        <div class="example">
+            <h3>Przykład</h3>
+            <p>
+                Jeśli chcemy zakodować wiadomość "HELLO", algorytm najpierw przekształca ją na ciąg bitów: <code>0100100001000101010011000100110001001111</code>. Następnie modyfikuje piksele obrazu, zmieniając ich LSB w kanałach R, G, B, aby zapisać dane. Po zakończeniu zapisu wynikowy obraz wygląda identycznie dla ludzkiego oka, ale zawiera ukrytą wiadomość.
+            </p>
+        </div>
+
+        <h2>Zalety metody</h2>
+        <p>
+            <ul>
+                <li>Prostota implementacji i zastosowania.</li>
+                <li>Niewidzialność zmodyfikowanych pikseli dla ludzkiego oka.</li>
+                <li>Wykorzystanie generatora pozycji zwiększa bezpieczeństwo i utrudnia nieautoryzowane odczytanie wiadomości.</li>
+            </ul>
+        </p>
+        <h2>Wady metody</h2>
+        <p>
+            <ul>
+                <li>Ograniczona ilość danych możliwa do ukrycia w obrazie.</li>
+                <li>Łatwość utraty danych w przypadku kompresji obrazu lub edycji.</li>
+                <li>Zależność bezpieczeństwa od wielkości i doboru liczb <code>P</code> i <code>G</code>.</li>
+            </ul>
+        </p>
+    </div>
+</body>
+</html>
