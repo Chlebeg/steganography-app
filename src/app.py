@@ -95,7 +95,6 @@ class App:
         selectImageButton = tk.Button(tab, text="Wybierz zdjęcie", command=lambda: self.selectImage(tabsName))
         selectImageButton.grid(row=2, column=0, pady=10, padx=10, sticky="ew")
 
-        # Nowy przycisk "Import z pliku" poniżej "Wybierz zdjęcie"
         importButton = tk.Button(tab, text="Import z pliku", command=lambda: self.importTextFromFile(tabsName))
         importButton.grid(row=3, column=0, pady=10, padx=10, sticky="ew")
 
@@ -159,79 +158,90 @@ class App:
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
+        # Stan dla zakładki HeatMap
+        self.heatMapState = {"originalImagePath": "", "encodedImagePath": ""}
+
         imageFrame = tk.Frame(tab)
         imageFrame.grid(row=0, column=0, pady=10, sticky="nsew")
         imageFrame.columnconfigure(0, weight=1)
         imageFrame.columnconfigure(1, weight=1)
 
-        self.originalImagePath = ""
-        self.encodedImagePath = ""
-        selectOriginalButton = tk.Button(imageFrame, text="Wybierz oryginalny obraz", command=self.selectOriginalImage)
-        selectEncodedButton = tk.Button(imageFrame, text="Wybierz zakodowany obraz", command=self.selectEncodedImage)
-        
+        selectOriginalButton = tk.Button(imageFrame, text="Wybierz oryginalny obraz",
+                                        command=lambda: self.selectOriginalImage(self.heatMapState))
+        selectEncodedButton = tk.Button(imageFrame, text="Wybierz zakodowany obraz",
+                                        command=lambda: self.selectEncodedImage(self.heatMapState))
+
         selectOriginalButton.grid(row=0, column=0, padx=10, pady=5)
         selectEncodedButton.grid(row=0, column=1, padx=10, pady=5)
-        
-        self.originalImageLabel = tk.Label(imageFrame, text="Oryginalny obraz")
-        self.encodedImageLabel = tk.Label(imageFrame, text="Zakodowany obraz")
 
-        self.originalImageLabel.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
-        self.encodedImageLabel.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
+        self.heatMapState["originalImageLabel"] = tk.Label(imageFrame, text="Oryginalny obraz")
+        self.heatMapState["encodedImageLabel"] = tk.Label(imageFrame, text="Zakodowany obraz")
+
+        self.heatMapState["originalImageLabel"].grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        self.heatMapState["encodedImageLabel"].grid(row=1, column=1, padx=10, pady=5, sticky="ew")
 
         statsFrame = tk.Frame(tab)
         statsFrame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
-        
+
         calculateStatsButton = tk.Button(tab, text="Pokaż heatmape", command=self.highlightDifferences)
         calculateStatsButton.grid(row=3, column=0, pady=10)
+
+
     def createComparisonTab(self, tab):
         """
-        createComparisonTab - function to create Comparision tab
+        createComparisonTab - function to create Comparison tab
         """
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
+        # Stan dla zakładki Comparison
+        self.comparisonState = {"originalImagePath": "", "encodedImagePath": ""}
+
         imageFrame = tk.Frame(tab)
         imageFrame.grid(row=0, column=0, pady=10, sticky="nsew")
         imageFrame.columnconfigure(0, weight=1)
         imageFrame.columnconfigure(1, weight=1)
 
-        self.originalImagePath = ""
-        self.encodedImagePath = ""
-        selectOriginalButton = tk.Button(imageFrame, text="Wybierz oryginalny obraz", command=self.selectOriginalImage)
-        selectEncodedButton = tk.Button(imageFrame, text="Wybierz zakodowany obraz", command=self.selectEncodedImage)
-        
+        selectOriginalButton = tk.Button(imageFrame, text="Wybierz oryginalny obraz",
+                                        command=lambda: self.selectOriginalImage(self.comparisonState))
+        selectEncodedButton = tk.Button(imageFrame, text="Wybierz zakodowany obraz",
+                                        command=lambda: self.selectEncodedImage(self.comparisonState))
+
         selectOriginalButton.grid(row=0, column=0, padx=10, pady=5)
         selectEncodedButton.grid(row=0, column=1, padx=10, pady=5)
-        
-        self.originalImageLabel = tk.Label(imageFrame, text="Oryginalny obraz")
-        self.encodedImageLabel = tk.Label(imageFrame, text="Zakodowany obraz")
 
-        self.originalImageLabel.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
-        self.encodedImageLabel.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
+        self.comparisonState["originalImageLabel"] = tk.Label(imageFrame, text="Oryginalny obraz")
+        self.comparisonState["encodedImageLabel"] = tk.Label(imageFrame, text="Zakodowany obraz")
+
+        self.comparisonState["originalImageLabel"].grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        self.comparisonState["encodedImageLabel"].grid(row=1, column=1, padx=10, pady=5, sticky="ew")
 
         statsFrame = tk.Frame(tab)
         statsFrame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
-        
+
         self.psnrLabel = tk.Label(statsFrame, text="PSNR: N/A")
         self.mseLabel = tk.Label(statsFrame, text="MSE: N/A")
-        
+
         self.psnrLabel.pack()
         self.mseLabel.pack()
 
         calculateStatsButton = tk.Button(tab, text="Oblicz statystyki", command=self.calculateStats)
         calculateStatsButton.grid(row=3, column=0, pady=10)
 
-    def selectOriginalImage(self):
-        filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png")])
-        if filePath:
-            self.originalImagePath = filePath
-            self.displayImage(filePath, self.originalImageLabel)
 
-    def selectEncodedImage(self):
+    def selectOriginalImage(self, state):
         filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png")])
         if filePath:
-            self.encodedImagePath = filePath
-            self.displayImage(filePath, self.encodedImageLabel)
+            state["originalImagePath"] = filePath
+            self.displayImage(filePath, state["originalImageLabel"])
+
+
+    def selectEncodedImage(self, state):
+        filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png")])
+        if filePath:
+            state["encodedImagePath"] = filePath
+            self.displayImage(filePath, state["encodedImageLabel"])
+
 
     def displayImage(self, filePath, label):
         image = Image.open(filePath)
@@ -240,9 +250,10 @@ class App:
         label.config(image=photo, text="")
         label.image = photo
 
+
     def highlightDifferences(self):
-        img1 = Image.open(self.originalImagePath).convert("RGB")
-        img2 = Image.open(self.encodedImagePath).convert("RGB")
+        img1 = Image.open(self.heatMapState["originalImagePath"]).convert("RGB")
+        img2 = Image.open(self.heatMapState["encodedImagePath"]).convert("RGB")
         
         # Upewnij się, że obrazy mają ten sam rozmiar
         if img1.size != img2.size:
@@ -269,12 +280,14 @@ class App:
         """
         calculateStats - calculates MSE and PSNR metrics between original and stegano images
         """
-        if not self.originalImagePath or not self.encodedImagePath:
+        originalImagePath = self.comparisonState["originalImagePath"]
+        encodedImagePath = self.comparisonState["encodedImagePath"]         
+        if not originalImagePath or not encodedImagePath:
             self.showTextInWindow("Wybierz oba obrazy przed obliczeniem statystyk.")
             return
 
-        original = cv2.imread(self.originalImagePath)
-        encoded = cv2.imread(self.encodedImagePath)
+        original = cv2.imread(originalImagePath)
+        encoded = cv2.imread(encodedImagePath)
 
         if original.shape != encoded.shape:
             self.showTextInWindow("Obrazy muszą mieć ten sam rozmiar.")
