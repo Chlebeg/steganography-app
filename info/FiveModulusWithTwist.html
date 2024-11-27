@@ -88,11 +88,11 @@ zakodowaną wiadomość trudną do wykrycia, zachowując jednocześnie wysoką j
 <p>Załóżmy, że chcemy ukryć literę "A" w bloku pikseli 3x3. Kod ASCII dla litery "A" to 65. Aby rozpocząć kodowanie, wykonujemy następujące kroki:</p>
 
 <ul>
-  <li><strong>Krok 1:</strong> Zaczynamy od wartości ASCII dla litery "A" (65). Od tej liczby odejmujemy 31, ponieważ pierwszym zakodowanym znakiem jest spacja (32 w ASCII).  
+  <li><strong>Krok 1:</strong> Zaczynamy od wartości ASCII dla litery "A" (65). W tej implementacji "alfabet" zaczyna się od 32-giej pozycji ASCII (spacja), dlatego przed rozpoczęciem kodowania, musimy odjąć 31 od wartości kodowanej litery.
       <code>65 - 31 = 34</code>
   </li>
   
-  <li><strong>Krok 2:</strong> Następnie dzielimy 34 przez 25 (choćby tylko w celu obliczenia reszty, która będziemy dodawać do liczby):  
+  <li><strong>Krok 2:</strong> Następnie dzielimy 34 przez 25 (choćby tylko w celu obliczenia reszty, którą będziemy dodawać do liczby):  
       <code>34 // 25 + 1 = 2</code> (dodajemy 1, aby reminder nie wynosił 0).
   </li>
 
