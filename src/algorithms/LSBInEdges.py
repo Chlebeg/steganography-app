@@ -7,23 +7,10 @@ import numpy as np
 
 
 def cannyEdgeDetection(image, thHigh, thLow, kernelSize):
-    """Detect edges using Canny edge detection."""
     edges = cv2.Canny(image, thLow, thHigh, apertureSize=kernelSize)
     return edges
 
 def embedMessageInEdges(image, message, edgeMap, key):
-    """
-    Embed a binary message in the edge pixels of the image using LSB substitution.
-    
-    Parameters:
-    - image: The grayscale or color image (numpy array).
-    - message: The binary message to be embedded.
-    - edgeMap: The edge map showing where edges are.
-    - key: The key for randomizing edge pixel order.
-    
-    Returns:
-    - Modified image with the embedded message.
-    """
     np.random.seed(key)  # Set the random seed for reproducibility
     edgePixels = np.argwhere(edgeMap != 0)  # Get coordinates of edge pixels
     np.random.shuffle(edgePixels)  # Shuffle the edge pixels for random embedding
@@ -85,7 +72,6 @@ def decode(imagePath):
     return extractedMessage
 
 def showEdges(image, edges):
-    """Show the image with detected edges."""
     edgeImage = np.zeros_like(image)  # Create a blank image
     edgeImage[edges != 0] = 255  # Set edge pixels to white (255)
     
@@ -95,18 +81,6 @@ def showEdges(image, edges):
     cv2.destroyAllWindows()
 
 def extractMessageFromEdges(image, edgeMap, key):
-    """
-    Extract the hidden message from the edge pixels.
-    
-    Parameters:
-    - image: The image with the embedded message.
-    - edgeMap: The edge map showing where edges are.
-    - messageLength: The length of the message to extract.
-    - key: The key for randomizing edge pixel order.randomPermute
-    
-    Returns:
-    - Extracted message.
-    """
     np.random.seed(key)  # Set the random seed for reproducibility
     edgePixels = np.argwhere(edgeMap != 0)
     np.random.shuffle(edgePixels)  # Shuffle edge pixels in the same way as during embedding
@@ -127,12 +101,7 @@ def extractMessageFromEdges(image, edgeMap, key):
     message = ''.join(chr(int(binaryMessage[i:i+8], 2)) for i in range(0, len(binaryMessage), 8))
     return message
 
-# Example usage
 if __name__ == "__main__":
-    """
-    Main function that processes command-line arguments for encoding or decoding 
-    a secret message in an image.
-    """
     # Edge detection
     thHigh = 192
     thLow = 63
@@ -173,8 +142,3 @@ if __name__ == "__main__":
     else:
         print("Invalid option. Use: [-d <image_path>] or [-e <image_path>]")
         sys.exit(1)
-    
-
-    
-    
-

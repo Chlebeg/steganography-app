@@ -4,10 +4,10 @@ import sys
 from pathlib import Path
 
 from PIL import Image
-   #P = 10007
-   #G = 10005
+#P = 10007
+#G = 10005  
 P = 100003
-G = 93111
+G = 93111 #It is possible to find larger prime (P) and generator for this prime. This would give more space for encoding
 
 def nextPosition(p = P, g = G):
     position = g
@@ -24,11 +24,11 @@ def bitsToMessage(bits):
     chars = [chr(int(bits[i:i+8], 2)) for i in range(0, len(bits), 8)]
     return ''.join(chars)
 
-def encodeBitsInPixels(pixels, bits, width, height, begin=False):
+def encodeBitsInPixels(pixels, bits, width, height, begin, imagePath):
     bitIdx = 0
     positionGenerator = nextPosition()
     
-    if len(bits) / 8 > countCharacterLimit():
+    if len(bits) / 8 > countCharacterLimit(imagePath):
         print("Too long secret message")
         return
     position = -1
@@ -41,7 +41,6 @@ def encodeBitsInPixels(pixels, bits, width, height, begin=False):
             x,y = position % width, 1 + position%(height-1)
         r, g, b = pixels[x, y]
 
-        # Encode one bit in each channel
         if bitIdx < len(bits):
             r = (r & 0b11111110) | int(bits[bitIdx])
             bitIdx += 1
@@ -76,8 +75,11 @@ def decodeBitsFromPixels(pixels, length, width, height, begin=False):
         bits += f'{b & 0b00000001:01b}'
         bitIdx += 3
 
-def countCharacterLimit(imagePath=""):
-    return (P-1) * 3 // 8 
+def countCharacterLimit(imagePath):
+    img = Image.open(imagePath)
+    result = img.height * img.width
+    result = (3 * result) // 8
+    return min((P-1) * 3 // 8 , result)
 
 def encode(imagePath, message):
     img = Image.open(imagePath)
@@ -89,10 +91,9 @@ def encode(imagePath, message):
     width, height = img.size
 
     metadata_bits = f'{messageLength:032b}'
-    encodeBitsInPixels(pixels, metadata_bits,width, height, True)
+    encodeBitsInPixels(pixels, metadata_bits,width, height, True, imagePath)
 
-    # Encode the message starting from the best start point
-    encodeBitsInPixels(pixels, bits, width, height)
+    encodeBitsInPixels(pixels, bits, width, height, False, imagePath)
 
     outputPath = os.path.join(Path(imagePath).parent, Path(imagePath).stem + "_lsbWithGenerator" + Path(imagePath).suffix)
     img.save(outputPath)
@@ -154,6 +155,5 @@ def main():
         print('Invalid option. Use -c for encoding a message, -f for encoding from a file, -d for decoding, or -d -f for saving the decoded message to a file.')
 
 if __name__ == '__main__':
-    #main()
     encode("../../photos/photo2.png","Ta1234567890!@#$%^&*()_jna wiadomosc", 20)
     print(decode("../../photos/photo2_lsbWithGenerator.png"))

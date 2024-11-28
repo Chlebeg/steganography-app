@@ -62,9 +62,6 @@ class App:
                 self.createStegoTab(tab, tabsName[i])
 
     def createStegoTab(self, tab, tabsName):
-        """
-        createStegoTab - function to create Stego tabs with encode and decode functions
-        """
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
@@ -116,8 +113,8 @@ class App:
         if filePath:
             with open(filePath, "r", encoding="utf-8") as file:
                 text = file.read()
-                self.textEntries[tabsName].delete("1.0", tk.END)  # Wyczyść pole tekstowe
-                self.textEntries[tabsName].insert(tk.END, text)  # Wstaw tekst do pola
+                self.textEntries[tabsName].delete("1.0", tk.END) 
+                self.textEntries[tabsName].insert(tk.END, text)  
 
 
     def countCharacterLimit(self, tabsName, imagePath):
@@ -139,10 +136,6 @@ class App:
         self.characterLimit[tabsName].config(text=f"Możliwa ilość znaków, które można zakodować: {specialValue}")
     
     def showInfo(self, tabsName):
-        """
-        showInfo - function to show window containing info about algorithm from an HTML file
-        using pywebview to render HTML content in a separate window.
-        """
         project_root = findProjectRoot()
         htmlFilePath = os.path.join(project_root ,"info", f"{tabsName}.html")
 
@@ -153,12 +146,10 @@ class App:
         webview.create_window("Informacje", htmlFilePath)
         webview.start()
 
-
     def createHeatMapTab(self, tab):
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
-        # Stan dla zakładki HeatMap
         self.heatMapState = {"originalImagePath": "", "encodedImagePath": ""}
 
         imageFrame = tk.Frame(tab)
@@ -188,13 +179,9 @@ class App:
 
 
     def createComparisonTab(self, tab):
-        """
-        createComparisonTab - function to create Comparison tab
-        """
         tab.rowconfigure(1, weight=1)
         tab.columnconfigure(0, weight=1)
 
-        # Stan dla zakładki Comparison
         self.comparisonState = {"originalImagePath": "", "encodedImagePath": ""}
 
         imageFrame = tk.Frame(tab)
@@ -228,20 +215,17 @@ class App:
         calculateStatsButton = tk.Button(tab, text="Oblicz statystyki", command=self.calculateStats)
         calculateStatsButton.grid(row=3, column=0, pady=10)
 
-
     def selectOriginalImage(self, state):
         filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png")])
         if filePath:
             state["originalImagePath"] = filePath
             self.displayImage(filePath, state["originalImageLabel"])
 
-
     def selectEncodedImage(self, state):
         filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png")])
         if filePath:
             state["encodedImagePath"] = filePath
             self.displayImage(filePath, state["encodedImageLabel"])
-
 
     def displayImage(self, filePath, label):
         image = Image.open(filePath)
@@ -250,36 +234,27 @@ class App:
         label.config(image=photo, text="")
         label.image = photo
 
-
     def highlightDifferences(self):
         img1 = Image.open(self.heatMapState["originalImagePath"]).convert("RGB")
         img2 = Image.open(self.heatMapState["encodedImagePath"]).convert("RGB")
         
-        # Upewnij się, że obrazy mają ten sam rozmiar
         if img1.size != img2.size:
             self.showTextInWindow("Obrazy muszą mieć ten sam rozmiar")
             raise ValueError("Obrazy muszą mieć ten sam rozmiar")
         
         diff = ImageChops.difference(img1, img2)
         
-        # Twórz obraz wynikowy, bazujący na pierwszym obrazie
         result = img1.copy()
         pixels = result.load()
         diffPixels = diff.load()
         
-        # Iteruj przez piksele i zaznacz różnice na czerwono
         for y in range(result.height):
             for x in range(result.width):
-                # Jeżeli różnica w jakimkolwiek kanale RGB jest większa od zera
                 if diffPixels[x, y] != (0, 0, 0):  
-                    pixels[x, y] = (255, 0, 0)  # Zaznacz piksel na czerwono
-        
-        # Wyświetl wynik
+                    pixels[x, y] = (255, 0, 0)  
         result.show()
+
     def calculateStats(self):
-        """
-        calculateStats - calculates MSE and PSNR metrics between original and stegano images
-        """
         originalImagePath = self.comparisonState["originalImagePath"]
         encodedImagePath = self.comparisonState["encodedImagePath"]         
         if not originalImagePath or not encodedImagePath:
@@ -303,26 +278,22 @@ class App:
         self.psnrLabel.config(text=f"PSNR: {psnr:.4f} dB")
 
     def showTextInWindow(self, text):
-        # Create a new Toplevel window
         newWindow = tk.Toplevel()
         newWindow.title("Text Display")
         
-        # Create a label to show the text
         textLabel = tk.Label(newWindow, text=text, wraplength=300, justify="left")
         textLabel.pack(padx=20, pady=20)
 
-        # Add a close button
         closeButton = tk.Button(newWindow, text="Zamknij", command=newWindow.destroy)
         closeButton.pack(pady=5)
 
     def encode(self, tabsName):
-        # Get the text from the text entry box for the specific tab
         text = self.textEntries[tabsName].get("1.0", tk.END).strip()
-        imagePath = self.imagePaths[tabsName]  # Get the selected image path for this tab
+        imagePath = self.imagePaths[tabsName]  
 
         if not imagePath:
             self.showTextInWindow("Musisz wybrać zdjęcie")
-            print("No image selected")  # Prompt to select an image
+            print("No image selected")  
             return
         if text:
             start = time.time()
@@ -352,11 +323,11 @@ class App:
             print("No text entered for encoding")
 
     def decode(self, tabsName):
-        imagePath = self.imagePaths[tabsName]  # Get the selected image path for this tab
+        imagePath = self.imagePaths[tabsName]  
 
         if not imagePath:
             self.showTextInWindow("Musisz wybrać zdjęcie")
-            print("Musisz wybrać zdjęcie")  # Prompt to select an image
+            print("Musisz wybrać zdjęcie")  
             return
 
         result = ""
@@ -382,15 +353,12 @@ class App:
             self.showTextInWindow("W zdjęciu nie ma zakodowanej wiadomości")
 
     def selectImage(self, tabsName):
-        # Function to select an image file for the specific tab
         filePath = filedialog.askopenfilename(filetypes=[("Image files", "*.png")])
         if filePath:
             print(f"Selected image in {tabsName}: {filePath}")
-            # Update the image path for this tab
             self.countCharacterLimit(tabsName, filePath)
             self.imagePaths[tabsName] = filePath
-            # Update the label to show the selected image's path
-            self.imagePathLabels[tabsName].config(text=f"Wybrane zdjęcie: {Path(filePath).name}")  # Display the selected image path
+            self.imagePathLabels[tabsName].config(text=f"Wybrane zdjęcie: {Path(filePath).name}")  
 
 if __name__ == "__main__":
     root = tk.Tk()

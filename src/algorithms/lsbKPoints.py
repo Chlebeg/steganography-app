@@ -5,7 +5,6 @@ from pathlib import Path
 
 from PIL import Image
 
-
 def messageToBits(message):
     return ''.join(f'{ord(c):08b}' for c in message)
 
@@ -52,7 +51,6 @@ def decodeBitsFromPixels(pixels, length, startX, startY, width, height):
 
     return bits
 
-# TODO - fix this - function should take into account the random point position and message length  coded at the begining of the message
 def countCharacterLimit(imagePath):
     img = Image.open(imagePath)
     result = img.height * img.width
@@ -68,7 +66,6 @@ def encode(imagePath, message, k):
 
     width, height = img.size
 
-    # Get k random starting points and find the best one
     candidates = [(random.randint(0, width-1), random.randint(0, height-1)) for _ in range(k)]
     best_start = None
     fewest_changes = float('inf')

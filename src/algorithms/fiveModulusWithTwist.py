@@ -5,18 +5,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-
 def squaresEncoding(squares, letter):
-    """
-    Encodes a character into a 3x3 square by modifying the red channel values.
-    
-    Parameters:
-    square (numpy array): A 3x3 array representing a portion of the image's red channel.
-    letter (str): The character to encode into the square.
-    
-    Returns:
-    numpy array: The modified square with the encoded character.
-    """
     letter = ord(letter)
     if letter < 32 or letter > 126:
         print("Error: Message contains an invalid character")
@@ -33,15 +22,6 @@ def squaresEncoding(squares, letter):
     return squares
 
 def squaresDecoding(squares):
-    """
-    Decodes a character from a 3x3 square by reading the red channel values.
-    
-    Parameters:
-    square (numpy array): A 3x3 array representing a portion of the image's red channel.
-    
-    Returns:
-    str: The decoded character or '-1' if no character is found.
-    """
     for square in range(3):
         for column in range(3):
             for row in range(3): 
@@ -52,15 +32,6 @@ def squaresDecoding(squares):
     return "-1"
 
 def imageToPixels(imagePath):
-    """
-    Loads an image from a file and converts it to a pixel array.
-    
-    Parameters:
-    imagePath (str): Path to the image file.
-    
-    Returns:
-    numpy array: Pixel array representing the image.
-    """
     image = Image.open(imagePath)
     
     # Check format and convert to RGB if RGBA
@@ -72,24 +43,11 @@ def imageToPixels(imagePath):
     return pixels
 
 def pixelsToImage(pixels, outputImagePath):
-    """
-    Converts a pixel array back into an image and saves it to a file.
-    
-    Parameters:
-    pixels (numpy array): Pixel array representing the image.
-    outputImagePath (str): Path to save the new image.
-    """
     image = Image.fromarray(pixels)
     image.save(outputImagePath, format="PNG")
     print(f"Image saved as: {outputImagePath}")
 
 def printPixels(pixels):
-    """
-    Prints the first 10 pixel values from a pixel array.
-    
-    Parameters:
-    pixels (numpy array): Pixel array representing the image.
-    """
     print("Pixel content (first 10 pixels):")
     h, w, c = pixels.shape
     for y in range(min(10, h)):
@@ -106,14 +64,6 @@ def countCharacterLimit(imagePath):
     
 
 def encode(imagePath, secretMessage):
-    """
-    Encodes a secret message into the red channel of the pixel array by modifying
-    red values in blocks of 3x3 pixels.
-    
-    Parameters:
-    imagePath (str): Path to the image
-    secretMessage (str): The secret message to encode.
-    """
     pixels = imageToPixels(imagePath)
     secretMessage = secretMessage.replace("\n", " ")
     if len(pixels.shape) == 3 and pixels.shape[2] == 3:
@@ -153,16 +103,6 @@ def encode(imagePath, secretMessage):
     return outputPath
 
 def decode(imagePath):
-    """
-    Decodes a secret message from the red channel of the pixel array by reading 
-    the red values in blocks of 3x3 pixels.
-    
-    Parameters:
-    imagePath (str): Path to the image
-    
-    Returns:
-    str: The decoded secret message.
-    """
     pixels = imageToPixels(imagePath)
     result = ""
     if len(pixels.shape) == 3 and pixels.shape[2] == 3:
@@ -188,10 +128,6 @@ def decode(imagePath):
     return result
 
 if __name__ == "__main__":
-    """
-    Main function that processes command-line arguments for encoding or decoding 
-    a secret message in an image.
-    """
     if len(sys.argv) != 3:
         print("Usage: python program.py [-d <imagePath>] or [-e <imagePath>]")
         sys.exit(1)
